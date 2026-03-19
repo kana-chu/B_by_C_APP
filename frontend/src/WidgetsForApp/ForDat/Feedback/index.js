@@ -7,4 +7,4 @@
  * @export
  */
 
-export { default as WFA_D_Fb_TimeInfoBox } from "./WFA_D_FB_TimeInfoBox.jsx";
+export { default as WFA_D_Fb_TimeInfoBox } from "./WFA_D_Fb_TimeInfoBox.jsx";
