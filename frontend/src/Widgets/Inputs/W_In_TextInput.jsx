@@ -1,39 +1,31 @@
 /**
- * @component W_I_TextInput
+ * @component W_In_TextInput
  * @folder Widgets/Inputs
- * @category Inputs
- * @description テキスト入力ウィジェット（readOnlyにも対応）
- *
- * @usage
- * ```jsx
- * <W_I_TextInput value={text} onChange={handleChange} />
- * ```
+ * @category Widgets
+ * @description
+ *   テキスト入力用の基本ウィジェット。
+ *   ・幅はデフォルト指定しない（呼び出し側が自由に指定）
+ *   ・readOnly でも見た目を保つ
  *
  * @export default
- */
+ */s
 
 export default function W_In_TextInput({
-    label,
-    value,
+    value = "",
     onChange,
-    placeholder = "",
-    maxLength,
-    pattern,
-    type = "text",
+    readOnly = false,
+    className = "",
 }) {
     return (
-        <div className="flex flex-col gap-1">
-            <label className="font-medium">{label}</label>
-
-            <input
-                type={type}
-                value={value}
-                onChange={onChange}
-                maxLength={maxLength}
-                pattern={pattern}
-                placeholder={placeholder}
-                className="border p-2 rounded-md shadow-sm"
-            />
-        </div>
+        <input
+            type="text"
+            value={value}
+            onChange={onChange}
+            readOnly={readOnly}
+            className={`
+                border rounded-md px-2 py-1 shadow-sm
+                ${className}
+            `}
+        />
     );
 }

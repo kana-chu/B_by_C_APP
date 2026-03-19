@@ -54,7 +54,17 @@ export default function WFA_D_Fb_TimeInfoBox({
             <div className="border rounded-lg bg-white shadow overflow-hidden">
 
                 {/* ==== テーブルヘッダー ==== */}
-                <div className="grid grid-cols-3 bg-gray-100 px-4 py-2 font-bold text-sm border-b">
+                <div
+                    className="
+                        grid
+                        grid-cols-[15ch_20ch_auto]
+                        bg-gray-100
+                        px-4
+                        py-2
+                        font-bold
+                        text-xs border-b
+                    "
+                >
                     <span>取得データ</span>
                     <span>時間・分換算</span>
                     <span>年月日時分換算</span>
@@ -63,22 +73,28 @@ export default function WFA_D_Fb_TimeInfoBox({
                 {/* ==== 中身：スクロール領域 ==== */}
                 <div
                     className="
-            overflow-y-scroll 
-            max-h-75             /* ← 10行固定高さ (1行30px x 10) */
-            scrollbar-thin             /* ← 常にスクロールバー表示 */
-            scrollbar-thumb-gray-400 
-            scrollbar-track-gray-200
-            text-sm                    /* ← 小さい文字 */
-          "
+                                overflow-y-scroll
+                                h-100                /* ← ★10 行ぶん固定 */
+                                scrollbar-thin
+                                scrollbar-thumb-gray-400
+                                scrollbar-track-gray-200
+                                text-xs                    /* ← 小さい文字 */
+                                "
                     style={{ overflowY: "scroll" }} // ← Chrome/Edge で常時スクロールバー表示
                 >
                     {secondsList.map((sec, i) => {
                         const t = compute(sec);
                         return (
-                            <div
+                                <div
                                 key={i}
-                                className="grid grid-cols-3 px-4 py-2 border-b last:border-b-0"
-                            >
+                                className="
+                                    grid
+                                    grid-cols-[15ch_20ch_auto]   /* ← 左2つは8文字幅、右だけ広い */
+                                    px-4 py-2
+                                    border-b last:border-b-0
+                                "
+                                >
+
                                 <div>{t.sec} 秒</div>
                                 <div>{t.hours} 時間 {t.minutes} 分</div>
                                 <div>{t.formatted}</div>
