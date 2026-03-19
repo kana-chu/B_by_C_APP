@@ -7,7 +7,7 @@ export default function Layout({ title, children }) {
                 {/* ▼ タイトルバー（ページタイトル共通パーツ） */}
                 <div className="h-15 bg-blue-200 rounded-md flex items-center px-4 shadow
                         mx-4 mt-4">
-                    <h1 className="text-lg font-bold">{title}</h1>
+                    <h1 className="text-lg font-bold font-meiryo">{title}</h1>
                 </div>
 
                 {/* 内枠：700 × 900（横中央・縦上寄せ・上50px空白）※Tailwind では 1rem = 4px（デフォルト）700px=175 w-[700px]といっしょ */}
