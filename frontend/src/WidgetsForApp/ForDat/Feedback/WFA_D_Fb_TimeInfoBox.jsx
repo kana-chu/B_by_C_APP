@@ -3,14 +3,16 @@
  * @folder WidgetsForApp/ForDat/Feedback
  * @category WidgetsForApp
  * @description
- *   Python バックエンドから受け取った秒数リストを
- *   「3カラムのテーブル形式」で、縦スクロールつき固定高さで表示する。
+ *   Python バックエンドから受け取った timeInfoList（sec,hms,datetime）を
+ *   3カラムテーブルでスクロール表示する。
  *
  * @usage
  * ```jsx
  * <WFA_D_Fb_TimeInfoBox
  *    header="ヘッダー記載の秒数一覧表示"
- *    secondsList={[100, 3600, 7200]}
+ *    timeInfoList={[
+ *        { sec:100, hms:"0h 01m 40s", datetime:"2024-01-01 00:01:40" },
+ *    ]}
  * />
  * ```
  *
@@ -21,39 +23,19 @@ import { W_Dis_Label } from "../../../Widgets/Display";
 
 export default function WFA_D_Fb_TimeInfoBox({
     header = "",
-    secondsList = [],
+    timeInfoList = [],
 }) {
-    const compute = (sec) => {
-        const hours = Math.floor(sec / 3600);
-        const minutes = Math.floor((sec % 3600) / 60);
-
-        const d = new Date(sec * 1000);
-        const y = d.getUTCFullYear();
-        const m = d.getUTCMonth() + 1;
-        const day = d.getUTCDate();
-        const h = d.getUTCHours();
-        const min = d.getUTCMinutes();
-
-        return {
-            sec,
-            hours,
-            minutes,
-            formatted: `${y}年 ${m}月 ${day}日 ${h}時 ${min}分`,
-        };
-    };
 
     return (
         <div className="flex flex-col gap-3 w-full">
 
-            {/* タイトル */}
             {header && (
                 <W_Dis_Label text={header} className="text-lg mb-1" />
             )}
 
-            {/* ==== テーブル外枠 ==== */}
             <div className="border rounded-lg bg-white shadow overflow-hidden">
 
-                {/* ==== テーブルヘッダー ==== */}
+                {/* ヘッダー */}
                 <div
                     className="
                         grid
@@ -70,40 +52,34 @@ export default function WFA_D_Fb_TimeInfoBox({
                     <span>年月日時分換算</span>
                 </div>
 
-                {/* ==== 中身：スクロール領域 ==== */}
+                {/* 本体 */}
                 <div
                     className="
-                                overflow-y-scroll
-                                h-100                /* ← ★10 行ぶん固定 */
-                                scrollbar-thin
-                                scrollbar-thumb-gray-400
-                                scrollbar-track-gray-200
-                                text-xs                    /* ← 小さい文字 */
-                                "
-                    style={{ overflowY: "scroll" }} // ← Chrome/Edge で常時スクロールバー表示
+                        overflow-y-scroll
+                        h-100
+                        scrollbar-thin
+                        scrollbar-thumb-gray-400
+                        scrollbar-track-gray-200
+                        text-xs
+                    "
                 >
-                    {secondsList.map((sec, i) => {
-                        const t = compute(sec);
-                        return (
-                                <div
-                                key={i}
-                                className="
-                                    grid
-                                    grid-cols-[15ch_20ch_auto]   /* ← 左2つは8文字幅、右だけ広い */
-                                    px-4 py-2
-                                    border-b last:border-b-0
-                                "
-                                >
+                    {timeInfoList.map((row, i) => (
+                        <div
+                            key={i}
+                            className="
+                                grid
+                                grid-cols-[15ch_20ch_auto]
+                                px-4 py-2
+                                border-b last:border-b-0
+                            "
+                        >
+                            <div>{row.sec} 秒</div>
+                            <div>{row.hms}</div>
+                            <div>{row.datetime}</div>
+                        </div>
+                    ))}
 
-                                <div>{t.sec} 秒</div>
-                                <div>{t.hours} 時間 {t.minutes} 分</div>
-                                <div>{t.formatted}</div>
-                            </div>
-                        );
-                    })}
-
-                    {/* データ0件の場合 */}
-                    {secondsList.length === 0 && (
+                    {timeInfoList.length === 0 && (
                         <div className="px-4 py-2 text-gray-400">
                             データがありません
                         </div>
