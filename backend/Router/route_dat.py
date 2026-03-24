@@ -26,7 +26,6 @@ from Feature.F_BuildDatBlockInfo import F_BuildDatBlockInfo
 
 router = APIRouter(prefix="/dat", tags=["dat"])
 
-
 @router.post("/change-scale")
 async def change_scale(
     file_path: str = Form(...),
@@ -71,20 +70,11 @@ async def change_scale(
     }
 
 @router.post("/inspect")
-async def inspect_dat(file_path: str = Form(...)):
-    blocks = F_BuildDatBlockInfo(file_path)
-
-    return {
-        "message": "OK",
-        "secondsList": [b["seconds"] for b in blocks],
-        "blocks": blocks,
-    }
-
-@router.post("/inspect")
 async def inspect_dat(
     file_path: str = Form(...),
     start_date: str = Form(...)
 ):
+    # ★ start_date を必ず渡す
     blocks = F_BuildDatBlockInfo(file_path, start_date)
 
     return {
@@ -98,3 +88,4 @@ async def inspect_dat(
             for b in blocks
         ]
     }
+
