@@ -22,6 +22,7 @@
 
 from fastapi import APIRouter, Form
 from Feature.F_ReadDatFile import F_ReadDatFile
+from Feature.F_BuildDatBlockInfo import F_BuildDatBlockInfo
 
 router = APIRouter(prefix="/dat", tags=["dat"])
 
@@ -67,4 +68,14 @@ async def change_scale(
             "calc_end": calc_end,
             "multiplier": multiplier,
         }
+    }
+
+@router.post("/inspect")
+async def inspect_dat(file_path: str = Form(...)):
+    blocks = F_BuildDatBlockInfo(file_path)
+
+    return {
+        "message": "OK",
+        "secondsList": [b["seconds"] for b in blocks],
+        "blocks": blocks,
     }

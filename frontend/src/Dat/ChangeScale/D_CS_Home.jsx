@@ -50,6 +50,8 @@ export default function D_CS_Home() {
 	const [progress, setProgress] = useState(0);
 	const [message, setMessage] = useState("準備中…");
 
+	const [blockInfo, setBlockInfo] = useState(null);
+
 	/** ▼ Electron ダイアログから絶対パスを取得する **/
 	const handleSelectInputFile = async () => {
 		const absolutePath = await window.electronAPI.selectFile();
@@ -96,6 +98,26 @@ export default function D_CS_Home() {
 		}
 	};
 
+	const handleInspect = async () => {
+		if (!path) {
+			setMessage("元データファイルを選択してください");
+			return;
+		}
+
+		setMessage("データ情報取得中…");
+		setProgress(10);
+
+		const data = await Mod_Api_Dat_Inspect({
+			file_path: path
+		});
+
+		setSecondsList(data.secondsList || []);
+		setBlockInfo(data.blocks || []);
+
+		setProgress(40);
+		setMessage("データ情報読み取り完了");
+	};
+
 	return (
 		<L_Layout title="datファイル等倍計算">
 
@@ -104,13 +126,6 @@ export default function D_CS_Home() {
 					label="元データファイル選択"
 					value={path}
 					onChange={(absPath) => setPath(absPath)}
-				/>
-
-				<W_Com_SaveFilePicker
-					label="保存データファイル新規作成"
-					value={savePath}
-					onChange={setSavePath}
-					defaultName="new.dat"
 				/>
 
 				{/* ▼ 日付範囲 */}
@@ -128,49 +143,65 @@ export default function D_CS_Home() {
 					/>
 				</div>
 
+				{/* ▼ データ情報確定ボタン */}
+				<W_In_Button
+					label="データ情報確定"
+					onClick={handleInspect}
+				/>
+
 				{/* ▼ 秒数一覧 ＋ 計算設定 */}
 				<div className="grid grid-cols-2 gap-8 w-full">
 
 					{/* 左：秒数一覧テーブル */}
-					<WFA_D_Fb_TimeInfoBox
-						header="ヘッダー記載の秒数一覧表示"
-						secondsList={secondsList}
-					/>
-
-					{/* 右：計算設定 */}
-					<div className="flex flex-col gap-6">
-
-						<W_Com_LabelSelectBox
-							label="降雨引き延ばし（引き縮め）開始時間"
-							value={calcStart}
-							onChange={setCalcStart}
-							options={["00:00", "01:00", "02:00"]}
+					<div className="grid grid-cols-2 gap-8 w-full">
+						<WFA_D_Fb_TimeInfoBox
+							header="ヘッダー記載の秒数一覧表示"
+							secondsList={secondsList}
 						/>
 
-						<W_Com_LabelSelectBox
-							label="降雨引き延ばし（引き縮め）終了時間"
-							value={calcEnd}
-							onChange={setCalcEnd}
-							options={["00:00", "01:00", "02:00"]}
-						/>
 
-						<W_Com_LabelTextInput
-							label="計算倍率"
-							value={multiplier}
-							onChange={setMultiplier}
-							type="float"
-							unit="倍"
-							maxLength={6}
-						/>
+						{/* 右：計算設定 */}
+						<div className="flex flex-col gap-6">
 
-						{/* ▼ API 送信 */}
-						<W_In_Button label="計算実行" onClick={handleSubmit} />
+							<W_Com_LabelSelectBox
+								label="降雨引き延ばし（引き縮め）開始時間"
+								value={calcStart}
+								onChange={setCalcStart}
+								options={["00:00", "01:00", "02:00"]}
+							/>
 
-						<W_Feed_Pro_Bar label="progress" value={progress} />
-						<W_Feed_Mess_Message text={message} />
+							<W_Com_LabelSelectBox
+								label="降雨引き延ばし（引き縮め）終了時間"
+								value={calcEnd}
+								onChange={setCalcEnd}
+								options={["00:00", "01:00", "02:00"]}
+							/>
+
+							<W_Com_LabelTextInput
+								label="計算倍率"
+								value={multiplier}
+								onChange={setMultiplier}
+								type="float"
+								unit="倍"
+								maxLength={6}
+							/>
+
+							{/* ▼ 保存データファイル新規作成 */}
+							<W_Com_SaveFilePicker
+								label="保存データファイル新規作成"
+								value={savePath}
+								onChange={setSavePath}
+								defaultName="new.dat"
+							/>
+
+							{/* ▼ API 送信 */}
+							<W_In_Button label="計算実行" onClick={handleSubmit} />
+
+							<W_Feed_Pro_Bar label="progress" value={progress} />
+							<W_Feed_Mess_Message text={message} />
+						</div>
 					</div>
 				</div>
-			</div>
 		</L_Layout>
 	);
 }
