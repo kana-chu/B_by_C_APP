@@ -23,3 +23,4 @@
 export { default as W_Dis_Label } from "./W_Dis_Label";
 export { default as W_Dis_Text } from "./W_Dis_Text";
 export { default as W_Dis_Value } from "./W_Dis_Value";
+export { default as W_Dis_LoadingScreen } from "./W_Dis_LoadingScreen";

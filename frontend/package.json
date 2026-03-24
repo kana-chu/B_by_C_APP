@@ -1,5 +1,5 @@
 {
-  "name": "frontend-template-react",
+  "name": "app-for-rri",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron": "electron ./electron/main.cjs",
+    "dev:app": "concurrently \"npm run dev\" \"npm run electron\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
@@ -21,6 +23,8 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.27",
+    "concurrently": "^9.2.1",
+    "electron": "^41.0.3",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
