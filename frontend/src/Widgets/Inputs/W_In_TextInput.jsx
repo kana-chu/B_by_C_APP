@@ -8,7 +8,7 @@
  *   ・readOnly でも見た目を保つ
  *
  * @export default
- */s
+ */
 
 export default function W_In_TextInput({
     value = "",
