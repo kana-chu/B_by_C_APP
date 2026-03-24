@@ -73,15 +73,74 @@ function createWindow() {
 }
 
 // ==========================================
-// ▼ ファイル/フォルダ選択
+// ▼ ファイル/フォルダ選択（UTF‑8(BOM無し)以外はすべてエラー）
 // ==========================================
 ipcMain.handle("select-file", async (event, mode = "file") => {
+
     const result = await dialog.showOpenDialog({
         properties: mode === "folder" ? ["openDirectory"] : ["openFile"],
     });
 
     if (result.canceled) return null;
-    return result.filePaths[0];
+
+    const selectedPath = result.filePaths[0];
+
+    // ▼ フォルダ選択はそのまま返す
+    if (mode === "folder") return selectedPath;
+
+    try {
+        const data = fs.readFileSync(selectedPath);
+
+        // ▼ BOM チェック（UTF‑8 BOM = EF BB BF）
+        const hasBOM =
+            data.length >= 3 &&
+            data[0] === 0xEF &&
+            data[1] === 0xBB &&
+            data[2] === 0xBF;
+
+        if (hasBOM) {
+            await dialog.showMessageBox({
+                type: "error",
+                title: "文字コードエラー（BOM付き）",
+                message:
+                    `このファイルは UTF-8(BOM付き) です。\n\n` +
+                    `UTF-8(BOMなし) のファイルを選択してください。\n\n` +
+                    `ファイル: ${selectedPath}`,
+                buttons: ["OK"],
+            });
+            return null;
+        }
+
+        // ▼ UTF‑8 の妥当性チェック（BOMなし）
+        const decoder = new TextDecoder("utf-8", { fatal: true });
+        try {
+            decoder.decode(data);
+        } catch (decodeErr) {
+            await dialog.showMessageBox({
+                type: "error",
+                title: "文字コードエラー",
+                message:
+                    `このファイルは UTF‑8(BOMなし) ではありません。\n\n` +
+                    `Shift-JIS / EUC-JP などは使用できません。\n\n` +
+                    `ファイル: ${selectedPath}`,
+                buttons: ["OK"],
+            });
+            return null;
+        }
+
+        // ▼ ここまで来たら UTF‑8(BOMなし) のみ
+        return selectedPath;
+
+    } catch (err) {
+        console.error("select-file 読み込みエラー:", err);
+        await dialog.showMessageBox({
+            type: "error",
+            title: "読み込みエラー",
+            message: `ファイルを読み込めませんでした。\n${selectedPath}`,
+            buttons: ["OK"],
+        });
+        return null;
+    }
 });
 
 // ==========================================
