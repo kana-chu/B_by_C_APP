@@ -3,8 +3,8 @@
  * @folder Widgets/Composite
  * @category Composite
  * @description
- * ファイル / フォルダ選択 + パス表示 の複合コンポーネント。
- * Widgets/Inputs のウィジェットを組み合わせて構成。
+ *   ファイル / フォルダ選択 + パス表示 の複合コンポーネント。
+ *   Widgets/Inputs のウィジェットを組み合わせて構成。
  *
  * @usage
  * ```jsx
@@ -18,55 +18,65 @@
  * ```
  *
  * @remarks
- * README 自動生成ツール対応。
+ *   - input[type=file] は hidden にして完全に非表示化
+ *   - 表示用 TextInput は横幅いっぱいに伸びる
  *
  * @export default
  */
 
 import { useRef } from "react";
 import {
-    W_I_Label,
-    W_I_TextInput,
-    W_I_Button,
-    W_I_FileOrFolderPicker,
+    W_In_TextInput,
+    W_In_Button
 } from "../Inputs";
+
+import {
+    W_Dis_Label,
+} from "../Display";
 
 export default function W_C_FileOrFolderPicker({
     label = "パス選択",
     value = "",
     onChange,
-    mode = "file",      // "file" or "folder"
-    accept = "",        // ".csv,.txt" など（mode=file の時のみ）
+    mode = "file",      // "file" | "folder"
+    accept = "",
 }) {
     const inputRef = useRef(null);
 
     return (
         <div className="flex flex-col gap-1 w-full">
+
             {/* ラベル */}
-            <W_I_Label text={label} />
+            <W_Dis_Label text={label} />
 
             <div className="flex items-center gap-2 w-full">
 
-                {/* パス表示 （読み取り専用） */}
-                <W_I_TextInput
+                {/* ★ パス表示（横幅いっぱい） */}
+                <W_In_TextInput
                     value={value}
                     readOnly
                     className="flex-1 bg-gray-100 shadow-inner"
                 />
 
                 {/* 選択ボタン */}
-                <W_I_Button
+                <W_In_Button
                     label="選択"
                     onClick={() => inputRef.current?.click()}
                 />
 
-                {/* 実際の hidden input（file/folder） */}
-                <W_I_FileOrFolderPicker
-                    refObj={inputRef}
-                    onChange={onChange}
-                    folder={mode === "folder"}
+                {/* ★ 完全非表示の input[type=file] */}
+                <input
+                    type="file"
+                    ref={inputRef}
+                    onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        onChange(f?.name ?? "");
+                    }}
                     accept={accept}
-                    hidden={true}
+                    {...(mode === "folder"
+                        ? { webkitdirectory: "true", directory: "true" }
+                        : {})}
+                    className="hidden"
                 />
             </div>
         </div>

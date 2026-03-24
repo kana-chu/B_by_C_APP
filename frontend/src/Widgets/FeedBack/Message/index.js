@@ -18,7 +18,7 @@
  * @export
  */
 
-export { default as W_Feed_Message } from "./W_Feed_Message";
-export { default as W_Feed_Success } from "./W_Feed_Success";
-export { default as W_Feed_Warning } from "./W_Feed_Warning";
-export { default as W_Feed_Error } from "./W_Feed_Error";
+export { default as W_Feed_Mess_Message } from "./W_Feed_Mess_Message";
+export { default as W_Feed_Mess_Success } from "./W_Feed_Mess_Success";
+export { default as W_Feed_Mess_Warning } from "./W_Feed_Mess_Warning";
+export { default as W_Feed_Mess_Error } from "./W_Feed_Mess_Error";

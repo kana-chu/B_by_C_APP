@@ -7,9 +7,9 @@
  *   エクスポートをひとつにまとめる集約ファイル。
  *
  *   例：
- *     - W_D_Label（ラベル表示）
- *     - W_D_Text（説明文）※今後追加見込み
- *     - W_D_Value（値表示）※今後追加見込み
+ *     - W_Dis_Label（ラベル表示）
+ *     - W_Dis_Text（説明文）※今後追加見込み
+ *     - W_Dis_Value（値表示）※今後追加見込み
  *
  * @usage
  * ```jsx
@@ -20,6 +20,6 @@
  */
 
 
-export { default as W_D_Label } from "./W_Dis_Label";
-export { default as W_D_Text } from "./W_Dis_Text";
-export { default as W_D_Value } from "./W_Dis_Value";
+export { default as W_Dis_Label } from "./W_Dis_Label";
+export { default as W_Dis_Text } from "./W_Dis_Text";
+export { default as W_Dis_Value } from "./W_Dis_Value";
