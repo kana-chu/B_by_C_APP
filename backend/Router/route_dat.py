@@ -79,3 +79,22 @@ async def inspect_dat(file_path: str = Form(...)):
         "secondsList": [b["seconds"] for b in blocks],
         "blocks": blocks,
     }
+
+@router.post("/inspect")
+async def inspect_dat(
+    file_path: str = Form(...),
+    start_date: str = Form(...)
+):
+    blocks = F_BuildDatBlockInfo(file_path, start_date)
+
+    return {
+        "message": "OK",
+        "timeInfoList": [
+            {
+                "sec": b["seconds"],
+                "hms": b["sec_info"]["h_m_s"],
+                "datetime": b["datetime_info"]["datetime_str"],
+            }
+            for b in blocks
+        ]
+    }
