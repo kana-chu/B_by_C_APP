@@ -39,35 +39,43 @@
 
 from Feature.F_ReadDatFile import F_ReadDatFile
 from Feature.F_ConvertSeconds import F_ConvertSeconds
+from Feature.F_ConvertSecondsToDatetime import F_ConvertSecondsToDatetime
 
-def F_BuildDatBlockInfo(input_file: str):
+def F_BuildDatBlockInfo(input_file: str, start_date: str):
 
     result = F_ReadDatFile(input_file)
-
     dfs = result["dfs"]
-    head_rows = result["head_rows"]   # [[sec, a, b], ...]
+    head_rows = result["head_rows"]
 
     block_info_list = []
 
     for idx, (df, head) in enumerate(zip(dfs, head_rows)):
 
         if head:
-            seconds = int(head[0])   # 先頭3列の1列目が秒数
+            seconds = int(head[0])
         else:
             seconds = None
 
-        # 秒数 → d/h/m/s & h/m/s 変換
+        # 相対時間（d/h/m/s & h/m/s）
         sec_info = (
             F_ConvertSeconds(seconds)
             if seconds is not None else
             {"d_h_m_s": "", "h_m_s": ""}
         )
 
+        # 絶対日時（start_date + seconds）
+        datetime_info = (
+            F_ConvertSecondsToDatetime(start_date, seconds)
+            if seconds is not None else
+            {"datetime_str": "", "date": "", "time": ""}
+        )
+
         block_info_list.append({
             "index": idx,
-            "raw_head": head,     # 3列
+            "raw_head": head,
             "seconds": seconds,
-            "sec_info": sec_info, # ★ これに d/h/m/s と h/m/s が両方入る
+            "sec_info": sec_info,
+            "datetime_info": datetime_info,  # ← ★ 追加！
             "df": df,
         })
 

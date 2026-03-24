@@ -202,6 +202,7 @@ export default function D_CS_Home() {
 						</div>
 					</div>
 				</div>
+			</div>
 		</L_Layout>
 	);
 }
