@@ -28,7 +28,7 @@ def F_ReadDatFile(input_file: str):
 
             cols = line.split()
 
-            # ★ 先頭行（4列のみ）で新しいブロック開始
+            # 先頭行（4列のみ）で新しいブロック開始
             if len(cols) == 4:
                 if current_block:
                     blocks.append(current_block)

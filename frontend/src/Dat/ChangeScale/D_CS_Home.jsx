@@ -141,14 +141,14 @@ export default function D_CS_Home() {
 					<div className="flex flex-col gap-6">
 
 						<W_Com_LabelSelectBox
-							label="本計算開始時間"
+							label="降雨引き延ばし（引き縮め）開始時間"
 							value={calcStart}
 							onChange={setCalcStart}
 							options={["00:00", "01:00", "02:00"]}
 						/>
 
 						<W_Com_LabelSelectBox
-							label="本計算終了時間"
+							label="降雨引き延ばし（引き縮め）終了時間"
 							value={calcEnd}
 							onChange={setCalcEnd}
 							options={["00:00", "01:00", "02:00"]}

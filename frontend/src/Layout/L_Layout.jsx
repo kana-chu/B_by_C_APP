@@ -3,7 +3,7 @@ export default function Layout({ title, children }) {
         <div className="min-h-screen w-full flex justify-center bg-gray-100">
 
             {/* 外枠：1000 × 800 */}
-            <div className="w-[1000px] h-[800px] bg-white shadow-lg overflow-hidden">
+            <div className="w-[1000px] h-[900px] bg-white shadow-lg overflow-hidden">
 
                 {/* タイトルバー */}
                 <div className="h-[60px] bg-blue-200 rounded-md flex items-center px-4 shadow mx-4 mt-4">
@@ -11,7 +11,7 @@ export default function Layout({ title, children }) {
                 </div>
 
                 {/* 内枠：700 × 900 */}
-                <div className="w-[700px] h-[900px] mx-auto p-5 text-xs">
+                <div className="w-[850px] h-[900px] mx-auto p-5 text-xs">
                     {children}
                 </div>
 
