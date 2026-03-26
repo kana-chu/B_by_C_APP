@@ -3,11 +3,11 @@
  * @folder Widgets/Inputs
  * @category Widgets
  * @description
- *   テーマカラーに準拠した、柔らかいラジオボタングループ。
- *   ・ミルクティー系ON
- *   ・淡いクリーム系OFF
- *   ・枠線はカードと統一（青灰色）
- *   ・テキスト色も統一
+ *   ui-* CSS変数に準拠したラジオボタングループ
+ *   ・ON  : ui-btn
+ *   ・OFF : ui-feedback
+ *   ・枠線・文字色は共通トークン
+ *   ・light / dark 両対応
  */
 
 export default function W_In_RadioGroup({
@@ -19,35 +19,40 @@ export default function W_In_RadioGroup({
 }) {
     return (
         <div className={`flex items-center gap-4 ${className}`}>
-            {options.map((opt) => (
-                <label 
-                    key={opt.value} 
-                    className="flex items-center gap-2 cursor-pointer text-[var(--ui-text)]"
-                >
-                    <span
-                        className={`
-                            h-4 w-4 rounded-full flex items-center justify-center
-                            border border-[var(--ui-card-border)]
-                            transition
-                            ${value === opt.value
-                                ? "bg-[#ECDDC4] border-[#D4C7B3]"  /* ON → ミルクティー */
-                                : "bg-[#E5E2DB]"                   /* OFF → クリームグレー */
-                            }
-                        `}
-                        onClick={() => onChange(opt.value)}
-                    >
-                        {/* 中のチェック丸 */}
-                        {value === opt.value && (
-                            <span className="h-2 w-2 rounded-full bg-[#3C3C3C]" />
-                        )}
-                    </span>
+            {options.map((opt) => {
+                const checked = value === opt.value;
 
-                    {/* ラベル文字 */}
-                    <span onClick={() => onChange(opt.value)}>
-                        {opt.label}
-                    </span>
-                </label>
-            ))}
+                return (
+                    <label
+                        key={opt.value}
+                        className="flex items-center gap-2 cursor-pointer text-[var(--ui-text)]"
+                    >
+                        {/* 外円 */}
+                        <span
+                            className={`
+                                        h-4 w-4 rounded-full flex items-center justify-center
+                                        border border-[var(--ui-card-border)]
+                                        transition-colors
+                                        ${checked
+                                                            ? "bg-[var(--ui-btn)]"
+                                                            : "bg-[var(--ui-feedback)]"}
+                                    `}
+                            onClick={() => onChange(opt.value)}
+                        >
+                            {/* 内円 */}
+                            {checked && (
+                                <span className="h-2 w-2 rounded-full bg-[var(--ui-btn-text)]" />
+                            )}
+                        </span>
+
+                        {/* ラベル文字 */}
+                        <span onClick={() => onChange(opt.value)}>
+                            {opt.label}
+                        </span>
+                    </label>
+                );
+            })}
         </div>
     );
 }
+``

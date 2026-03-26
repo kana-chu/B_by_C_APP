@@ -3,30 +3,43 @@
  * @folder Widgets/Display
  * @category Display
  * @description
- *   アプリ全体やページ切り替え時に表示するローディング画面。
- *   中央配置されたスピナー & フェードアニメーション付き表示。
+ *   ui-* CSS変数に準拠したローディング画面。
+ *   アプリ全体・ページ遷移時に表示するフルスクリーンUI。
  *
  * @usage
- * ```jsx
  * <W_Dis_LoadingScreen />
- * ```
- *
- * @remarks
- *   - 画面全体を覆うフルサイズのローディング表示
- *   - animate-pulse / animate-spin を利用したアニメーション演出
- *   - 背景色/テキスト色はアプリの柔らかいUIに合わせて調整済み
- *
- * @export default
  */
 
 export default function W_Dis_LoadingScreen() {
     return (
-        <div className="w-full h-screen flex flex-col items-center justify-center bg-white animate-fadeIn">
+        <div
+            className="
+                w-full h-screen
+                flex flex-col items-center justify-center
+                bg-[var(--ui-app)]
+                animate-fadeIn
+            "
+        >
             {/* スピナー */}
-            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div
+                className="
+                    w-12 h-12 mb-4
+                    border-4
+                    border-[var(--ui-progress-bg)]
+                    border-t-[var(--ui-progress-fill)]
+                    rounded-full
+                    animate-spin
+                    "
+            />
 
             {/* メッセージ */}
-            <div className="text-gray-600 text-lg animate-pulse">
+            <div
+                className="
+                    text-lg
+                    text-[var(--ui-text-sub)]
+                    animate-pulse
+                    "
+            >
                 読み込み中…
             </div>
         </div>
