@@ -158,7 +158,7 @@ export default function D_CS_Home() {
                 />
 
                 {/* ▼ 2カラム：左（55%）→一覧、右（45%）→計算設定 */}
-                <div className="grid grid-cols-[11fr_9fr] gap-8">
+                <div className="grid grid-cols-[3fr_2fr] gap-8">
 
                     {/* ★ 左：秒数一覧 */}
                     <WFA_D_Fb_TimeInfoBox
@@ -202,7 +202,7 @@ export default function D_CS_Home() {
                 </div>
 
                 {/* ▼ 保存先ファイル */}
-                <div className="w-full">
+                <div className="w-full my-1">
                     <W_Com_SaveFilePicker
                         label="⑦ 保存データファイル選択（新規作成も可）"
                         value={savePath}
@@ -212,14 +212,14 @@ export default function D_CS_Home() {
                 </div>
 
                 {/* ▼ 進行：左7割 / 右3割 */}
-                <div className="grid grid-cols-[7fr_3fr] gap-4 w-full">
+                <div className="grid grid-cols-[7fr_3fr] gap-4 w-full items-start -mt-10">
 
                     <div className="flex flex-col gap-2 w-full">
                         <W_Feed_Pro_Bar label="progress" value={progress} />
                         <W_Feed_Mess_Message text={message} />
                     </div>
 
-                    <div className="flex justify-end items-start w-full">
+                    <div className="flex justify-end w-full mt-8 pr-14">
                         <W_In_Button
                             label="⑧ 計算実行"
                             onClick={handleSubmit}

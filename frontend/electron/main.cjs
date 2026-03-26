@@ -53,8 +53,8 @@ function createWindow() {
 
     // ▼ React(main) ウィンドウ
     mainWindow = new BrowserWindow({
-        width: 1400,
-        height: 900,
+        width: 1050,
+        height: 910,
         show: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.cjs"),
