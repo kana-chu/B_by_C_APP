@@ -22,7 +22,7 @@
 import { useNavigate } from "react-router-dom";
 
 // 共通レイアウト
-import L_Layout from "./Layout/L_Layout";
+import L_Layout from "./Styles/Layout/L_Layout";
 
 // Widgets/Inputs
 import {

@@ -1,26 +1,10 @@
 /**
  * @component W_C_DateRangePicker
- * @folder Widgets/Composite
- * @category Composite
  * @description
- *   以下の要素が横に並ぶ複合コンポーネント：
- *     - ラベル（W_D_Label）
- *     - 開始日入力（W_I_DateInput）
- *     - "～" 表示（W_D_Value）
- *     - 終了日入力（W_I_DateInput）
- *
- * @usage
- * ```jsx
- * <W_C_DateRangePicker
- *    label="選択した元データの期間"
- *    startValue={start}
- *    endValue={end}
- *    onStartChange={(e) => setStart(e.target.value)}
- *    onEndChange={(e) => setEnd(e.target.value)}
- * />
- * ```
- *
- * @export default
+ *   日付範囲入力を UI テーマに合わせて最適化したコンポーネント。
+ *   - 枠線色 / テキスト色 / 背景色すべてテーマ対応
+ *   - 角ズレ防止（親で rounded-md、childは rounded-none）
+ *   - 「～」記号もテーマのサブテキストカラーで統一
  */
 
 import { W_D_Label, W_D_Value } from "../Display";
@@ -36,21 +20,63 @@ export default function W_C_DateRangePicker({
     return (
         <div className="flex items-center gap-4 w-full">
 
-            {/* 左側ラベル */}
-            <div className="min-w-50">
+            {/* 左ラベル */}
+            <div className="min-w-50 text-[var(--ui-text)]">
                 <W_D_Label text={label} />
             </div>
 
-            {/* 開始日 */}
-            <W_I_DateInput value={startValue} onChange={onStartChange} />
+            {/* 開始日入力（角ズレ防止の枠） */}
+            <div
+                className="
+                    border border-[var(--ui-card-border)]
+                    bg-[var(--ui-card)]
+                    rounded-md shadow-sm overflow-hidden
+                    px-1
+                "
+            >
+                <W_I_DateInput
+                    value={startValue}
+                    onChange={onStartChange}
+                    className="
+                        bg-transparent
+                        rounded-none
+                        text-[var(--ui-text)]
+                        focus:outline-none
+                    "
+                />
+            </div>
 
-            {/* 区切り "～" */}
-            <W_D_Value value="～" className="border-none bg-transparent shadow-none" />
+            {/* 区切り：～ */}
+            <W_D_Value
+                value="～"
+                className="
+                    text-[var(--ui-text-sub)]
+                    bg-transparent 
+                    border-none shadow-none
+                "
+            />
 
-            {/* 終了日 */}
-            <W_I_DateInput value={endValue} onChange={onEndChange} />
+            {/* 終了日入力（同じ枠構造） */}
+            <div
+                className="
+                    border border-[var(--ui-card-border)]
+                    bg-[var(--ui-card)]
+                    rounded-md shadow-sm overflow-hidden
+                    px-1
+                "
+            >
+                <W_I_DateInput
+                    value={endValue}
+                    onChange={onEndChange}
+                    className="
+                        bg-transparent
+                        rounded-none
+                        text-[var(--ui-text)]
+                        focus:outline-none
+                    "
+                />
+            </div>
 
         </div>
     );
 }
-``
