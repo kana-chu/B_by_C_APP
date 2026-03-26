@@ -22,7 +22,7 @@ export default function WFA_D_Fb_TimeInfoBox({
             {header && (
                 <W_Dis_Label
                     text={header}
-                    className="text-lg mb-1 text-[var(--ui-text)]"
+                    className="text-[1.05rem] mb-1 text-[var(--ui-text)]"
                 />
             )}
 
@@ -68,7 +68,7 @@ export default function WFA_D_Fb_TimeInfoBox({
                             key={i}
                             className="
                                 grid
-                                grid-cols-[15ch_20ch-auto]
+                                grid-cols-[15ch_20ch_auto]
                                 px-4 py-2
                                 border-b last:border-b-0
                                 border-[var(--ui-table-border)]

@@ -16,7 +16,7 @@ export default function W_Feed_Progress({ label = "progress", value = 0 }) {
     const safeValue = Math.min(100, Math.max(0, value)); // 0〜100 に丸め
 
     return (
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-0 w-full">
 
             {/* 上段：ラベル + 数値 */}
             <div className="flex items-center gap-4">
