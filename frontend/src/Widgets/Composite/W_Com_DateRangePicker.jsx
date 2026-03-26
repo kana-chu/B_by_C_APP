@@ -51,7 +51,7 @@ export default function W_C_DateRangePicker({
                 value="～"
                 className="
                     text-[var(--ui-text-sub)]
-                    bg-transparent 
+                    bg-transparent
                     border-none shadow-none
                 "
             />

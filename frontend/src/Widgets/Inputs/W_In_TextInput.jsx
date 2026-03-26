@@ -3,11 +3,10 @@
  * @folder Widgets/Inputs
  * @category Widgets
  * @description
- *   テキスト入力用の基本ウィジェット。
- *   ・幅はデフォルト指定しない（呼び出し側が自由に指定）
+ *   ui-* CSS変数ベースのテキスト入力ウィジェット
+ *   ・幅は指定しない
  *   ・readOnly でも見た目を保つ
- *
- * @export default
+ *   ・light / dark 両対応
  */
 
 export default function W_In_TextInput({
@@ -23,9 +22,16 @@ export default function W_In_TextInput({
             onChange={onChange}
             readOnly={readOnly}
             className={`
-                border rounded-md px-2 py-1 shadow-sm
-                ${className}
-            `}
+                        rounded-md px-2 py-1 shadow-sm
+                        border border-[var(--ui-card-border)]
+                        bg-[var(--ui-card)]
+                        text-[var(--ui-text)]
+                        placeholder:text-[var(--ui-text-sub)]
+                        focus:outline-none
+                        focus:ring-2 focus:ring-[var(--ui-header-strong)]
+                        ${readOnly ? "cursor-default opacity-90" : ""}
+                        ${className}
+                    `}
         />
     );
 }

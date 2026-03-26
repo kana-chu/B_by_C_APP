@@ -58,7 +58,7 @@ export default function D_CS_Home() {
 
     // ▼ 進行表示
     const [progress, setProgress] = useState(0);
-    const [message, setMessage] = useState("準備中…");
+    const [message, setMessage] = useState("計算実行前…");
 
 
     /** ▼ データ情報確定 */
