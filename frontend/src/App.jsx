@@ -12,13 +12,13 @@
  * ```
  *
  * @remarks
- *   - react-router-dom の BrowserRouter / Routes / Route を使用。
+ *   - react-router-dom の HashRouter  / Routes / Route を使用。
  *   - "読み込み中…" 表示はアプリ演出＆Electron / API 連動も可能。
  *
  * @export default
  */
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter , Routes, Route } from "react-router-dom";
 
 import Home from "./Home";
 import D_CS_Home from "./Dat/ChangeScale/D_CS_Home";
@@ -51,11 +51,11 @@ export default function App() {
     if (isLoading) return <W_Dis_LoadingScreen />;
 
     return (
-        <BrowserRouter>
+        <HashRouter>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/dat/change-scale" element={<D_CS_Home />} />
             </Routes>
-        </BrowserRouter>
+        </HashRouter >
     );
 }

@@ -1,194 +1,140 @@
 /**
- * @component ElectronMain
- * @folder electron
- * @category Electron
- * @description
- *   React（フロントエンド）と連携する Electron メインプロセス。
- *   スプラッシュ画面表示、Vite の読み込み管理、プリロードスクリプト登録、
- *   ファイル/フォルダ選択、保存ダイアログ（上書き確認は Windows に任せる）、
- *   ファイル存在チェックなどを提供する。
- *
- * @usage
- *   // frontend/package.json 内の scripts:
- *   {
- *     "electron": "electron ../electron/main.cjs",
- *     "dev:app": "concurrently \"npm run dev\" \"npm run electron\""
- *   }
- *
- *   // React 側での呼び出し例
- *   const path = await window.electronAPI.selectFile("file");
- *   const savePath = await window.electronAPI.saveDialog("output.dat");
- *   const exists = await window.electronAPI.checkExists(path);
- *
- * @remarks
- *   - Windows の showSaveDialog は同名ファイルが選択された場合、
- *     OS のネイティブ上書き確認ダイアログを **自動で1回だけ** 表示するため、
- *     Electron 側での重複上書き確認は不要（実装しない）。
- *   - 保存時は空ファイルを自動生成して React 側へ絶対パスを返す。
- *
- * @export
+ * Electron Main Process (FINAL - PRODUCTION)
  */
 
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { spawn } = require("child_process");
+const net = require("net");
 const path = require("path");
 const fs = require("fs");
 
-let splash;
-let mainWindow;
+let mainWindow = null;
+let backendProcess = null;
 
-// ==========================================
-// ▼ メインウィンドウ + スプラッシュ画面生成
-// ==========================================
-function createWindow() {
+const DEBUG = false;
 
-    // ▼ スプラッシュ画面
-    splash = new BrowserWindow({
-        width: 360,
-        height: 260,
-        frame: false,
-        alwaysOnTop: true,
-        resizable: false,
-    });
-    splash.loadFile(path.join(__dirname, "splash.html"));
-
-    // ▼ React(main) ウィンドウ
-    mainWindow = new BrowserWindow({
-        width: 1050,
-        height: 910,
-        show: false,
-        webPreferences: {
-            preload: path.join(__dirname, "preload.cjs"),
-        },
-    });
-
-    // Vite を読み込み
-    mainWindow.loadURL("http://localhost:5173");
-
-    // 完了時 → スプラッシュ閉じてメイン表示
-    mainWindow.webContents.on("did-finish-load", () => {
-        mainWindow.show();
-        if (splash) splash.close();
-        mainWindow.webContents.send("electron-ready");
-    });
+/* =====================================================
+ * backend.exe path
+ * ===================================================== */
+function getBackendPath() {
+  if (app.isPackaged) {
+    return path.join(
+      process.resourcesPath,
+      "app.asar.unpacked",
+      "electron",
+      "backend",
+      "backend",
+      "backend.exe"
+    );
+  }
+  return path.join(__dirname, "backend", "backend", "backend.exe");
 }
 
-// ==========================================
-// ▼ ファイル/フォルダ選択（UTF‑8(BOM無し)以外はすべてエラー）
-// ==========================================
-ipcMain.handle("select-file", async (event, mode = "file") => {
+/* =====================================================
+ * backend launch
+ * ===================================================== */
+function startBackend() {
+  if (backendProcess) return;
 
-    const result = await dialog.showOpenDialog({
-        properties: mode === "folder" ? ["openDirectory"] : ["openFile"],
-    });
+  const backendPath = getBackendPath();
+  if (!fs.existsSync(backendPath)) {
+    dialog.showErrorBox("Backend Error", backendPath);
+    app.quit();
+    return;
+  }
 
-    if (result.canceled) return null;
+  backendProcess = spawn(backendPath, [], {
+    windowsHide: true,
+    stdio: "ignore",
+  });
+}
 
-    const selectedPath = result.filePaths[0];
+/* =====================================================
+ * backend wait
+ * ===================================================== */
+function waitForBackend(port = 8000, timeoutMs = 30000) {
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      const socket = new net.Socket();
+      socket.once("error", () => {
+        socket.destroy();
+        if (Date.now() - start > timeoutMs) reject();
+        else setTimeout(check, 500);
+      });
+      socket.connect(port, "127.0.0.1", () => {
+        socket.end();
+        resolve();
+      });
+    };
+    check();
+  });
+}
 
-    // ▼ フォルダ選択はそのまま返す
-    if (mode === "folder") return selectedPath;
+/* =====================================================
+ * main window
+ * ===================================================== */
+async function createWindow() {
+  startBackend();
+  try {
+    await waitForBackend();
+  } catch {
+    dialog.showErrorBox("Error", "Backend failed to start");
+    app.quit();
+    return;
+  }
 
-    try {
-        const data = fs.readFileSync(selectedPath);
+  mainWindow = new BrowserWindow({
+    width: 1050,
+    height: 910,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.cjs"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      devTools: DEBUG,
+      webSecurity: true,
+    },
+  });
 
-        // ▼ BOM チェック（UTF‑8 BOM = EF BB BF）
-        const hasBOM =
-            data.length >= 3 &&
-            data[0] === 0xEF &&
-            data[1] === 0xBB &&
-            data[2] === 0xBF;
+  const indexPath = path.join(app.getAppPath(), "dist", "index.html");
+  mainWindow.loadFile(indexPath);
 
-        if (hasBOM) {
-            await dialog.showMessageBox({
-                type: "error",
-                title: "文字コードエラー（BOM付き）",
-                message:
-                    `このファイルは UTF-8(BOM付き) です。\n\n` +
-                    `UTF-8(BOMなし) のファイルを選択してください。\n\n` +
-                    `ファイル: ${selectedPath}`,
-                buttons: ["OK"],
-            });
-            return null;
-        }
+  mainWindow.webContents.on("did-finish-load", () => {
+    mainWindow.webContents.send("electron-ready");
+    if (DEBUG) mainWindow.webContents.openDevTools({ mode: "detach" });
+  });
+}
 
-        // ▼ UTF‑8 の妥当性チェック（BOMなし）
-        const decoder = new TextDecoder("utf-8", { fatal: true });
-        try {
-            decoder.decode(data);
-        } catch (decodeErr) {
-            await dialog.showMessageBox({
-                type: "error",
-                title: "文字コードエラー",
-                message:
-                    `このファイルは UTF‑8(BOMなし) ではありません。\n\n` +
-                    `Shift-JIS / EUC-JP などは使用できません。\n\n` +
-                    `ファイル: ${selectedPath}`,
-                buttons: ["OK"],
-            });
-            return null;
-        }
-
-        // ▼ ここまで来たら UTF‑8(BOMなし) のみ
-        return selectedPath;
-
-    } catch (err) {
-        console.error("select-file 読み込みエラー:", err);
-        await dialog.showMessageBox({
-            type: "error",
-            title: "読み込みエラー",
-            message: `ファイルを読み込めませんでした。\n${selectedPath}`,
-            buttons: ["OK"],
-        });
-        return null;
-    }
+/* =====================================================
+ * IPC handlers
+ * ===================================================== */
+ipcMain.handle("select-file", async (_, mode = "file") => {
+  const result = await dialog.showOpenDialog({
+    properties: mode === "folder" ? ["openDirectory"] : ["openFile"],
+  });
+  return result.canceled ? null : result.filePaths[0];
 });
 
-// ==========================================
-// ▼ 保存ダイアログ（上書き確認は Windows に任せる）
-//    → 選択された時点で空ファイル作成
-// ==========================================
-ipcMain.handle("save-dialog", async (event, defaultName = "output.dat") => {
-
-    const { filePath, canceled } = await dialog.showSaveDialog({
-        title: "保存ファイル名を指定",
-        defaultPath: defaultName,
-        filters: [
-            { name: "DAT Files", extensions: ["dat", "txt"] },
-            { name: "All Files", extensions: ["*"] },
-        ]
-    });
-
-    if (canceled || !filePath) return null;
-
-    try {
-        // 親フォルダ作成
-        const parent = path.dirname(filePath);
-        fs.mkdirSync(parent, { recursive: true });
-
-        // OS側で上書き警告が出た後の結果なので
-        // 空ファイルを作成（新規 or 上書き）
-        fs.writeFileSync(filePath, "");
-
-        return filePath;
-
-    } catch (err) {
-        console.error("保存ファイル作成エラー:", err);
-        return null;
-    }
+ipcMain.handle("save-dialog", async (_, defaultName) => {
+  const { filePath, canceled } = await dialog.showSaveDialog({
+    defaultPath: defaultName,
+  });
+  if (canceled || !filePath) return null;
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, "");
+  return filePath;
 });
 
-// ==========================================
-// ▼ ファイル存在チェック
-// ==========================================
-ipcMain.handle("check-exists", async (event, targetPath) => {
-    return { exists: fs.existsSync(targetPath) };
-});
+ipcMain.handle("check-exists", async (_, p) => ({
+  exists: fs.existsSync(p),
+}));
 
-// ==========================================
-// ▼ Electron アプリ起動
-// ==========================================
+/* =====================================================
+ * lifecycle
+ * ===================================================== */
+app.on("before-quit", () => backendProcess?.kill());
 app.whenReady().then(createWindow);
-
 app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") app.quit();
+  if (process.platform !== "darwin") app.quit();
 });

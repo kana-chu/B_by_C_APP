@@ -1,13 +1,98 @@
-# Python
+# ======================================================
+# Python / FastAPI / Data tools
+# ======================================================
 __pycache__/
+*.py[cod]
 *.pyc
+*.pyo
+*.pyd
+*.log
 
-# Node / frontend
+# Python build / cache
+build/
+dist/
+*.spec
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter / pandas / dill / pickle 等
+.ipynb_checkpoints/
+*.pkl
+*.pickle
+*.joblib
+*.dill
+
+# ======================================================
+# Node.js / Frontend (Next.js / Vite / React)
+# ======================================================
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Environment
+# Build outputs
+dist/
+.next/
+out/
+
+# Vite cache
+.vite/
+.vite-cache/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# ======================================================
+# Electron
+# ======================================================
+# electron-builder outputs
+release/
+win-unpacked/
+linux-unpacked/
+mac-unpacked/
+
+# ✅ Electron + PyInstaller backend（重要）
+frontend/electron/backend/
+frontend/electron/backend/**
+
+# Installers / binaries
+*.exe
+*.msi
+*.dmg
+*.AppImage
+
+# Windows / Python runtime DLLs
+*.dll
+*.pdb
+
+# Electron runtime cache
+.cache/
+electron-debug.log
+
+# ======================================================
+# Supabase
+# ======================================================
+# Supabase local runtime cache
+.supabase/
+supabase/.temp/
+
+# ======================================================
+# Environment Variables (never commit secrets)
+# ======================================================
 .env
+.env.*
+!.env.example
 
-# OS
-.DS_Store
-Thumbs.db
+# ======================================================
+# Analytics / DWH / Export data
+# ======================================================
+*.csv
+*.tsv
+*.parquet
+*.avro
+*.feather
