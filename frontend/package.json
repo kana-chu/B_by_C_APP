@@ -1,22 +1,33 @@
 {
   "name": "app-for-rri",
+  "productName": "DAT 引き伸ばし引き縮めツール",
+  "version": "1.0.0",
+  "description": "DAT ファイルの降雨引き伸ばし・引き縮め計算を行うローカル業務用ツール",
+  "author": "Your Organization Name",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+
+  "main": "electron/main.cjs",
+
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+
     "electron": "electron ./electron/main.cjs",
-    "dev:app": "concurrently \"npm run dev\" \"npm run electron\""
+    "dev:app": "concurrently \"npm run dev\" \"npm run electron\"",
+
+    "dist:win": "npm run build && electron-builder --win --x64"
   },
+
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1"
   },
+
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.7",
@@ -25,6 +36,7 @@
     "autoprefixer": "^10.4.27",
     "concurrently": "^9.2.1",
     "electron": "^41.0.3",
+    "electron-builder": "^26.8.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
@@ -32,5 +44,43 @@
     "postcss": "^8.5.8",
     "tailwindcss": "^3.4.19",
     "vite": "^7.3.1"
+  },
+
+  "build": {
+    "appId": "jp.co.example.appforrri",
+    "productName": "DAT 引き伸ばし引き縮めツール",
+
+    "asar": true,
+    "asarUnpack": [
+      "electron/backend/**"
+    ],
+
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+
+    "directories": {
+      "output": "release"
+    },
+
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+
+      "shortcutName": "DAT 引き伸ばし引き縮めツール"
+    }
   }
 }

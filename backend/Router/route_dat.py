@@ -18,6 +18,8 @@ from Feature.F_FilterBlockByRange import F_FilterBlockByRange
 from Feature.F_ChangeScale import F_ChangeScale
 from Feature.F_SaveChangedDatFile import F_SaveChangedDatFile
 
+from pydantic import BaseModel
+
 router = APIRouter(prefix="/dat", tags=["dat"])
 
 
@@ -29,7 +31,6 @@ async def change_scale(
     file_path: str = Form(...),
     save_path: str = Form(...),
     start_date: str = Form(...),
-    end_date: str = Form(...),     # ※ 仕様上受け取るが、現時点では未使用
     calc_start: str = Form(...),   # 秒（UIで選択された block.seconds）
     calc_end: str = Form(...),
     multiplier: str = Form(...)
@@ -117,26 +118,25 @@ async def change_scale(
 # ======================================================
 # ▼ inspect（ブロック一覧取得：UI表示用）
 # ======================================================
+class InspectRequest(BaseModel):
+    file_path: str
+    start_date: str
+
 @router.post("/inspect")
-async def inspect_dat(
-    file_path: str = Form(...),
-    start_date: str = Form(...)
-):
-    """
-    dat ファイルを解析し、
-    ブロックごとの秒数・表示用情報を返す
-    （TimeInfoBox 用）
-    """
-    blocks = F_BuildDatBlockInfo(file_path, start_date)
+async def inspect_dat(req: InspectRequest):
+    blocks = F_BuildDatBlockInfo(
+        req.file_path,
+        req.start_date,
+    )
 
     return {
         "message": "OK",
         "total_blocks": len(blocks),
         "timeInfoList": [
             {
-                "sec": b["seconds"],                           # 秒（calc_start/calc_end 用）
-                "hms": b["sec_info"]["h_m_s"],                 # 表示用
-                "datetime": b["datetime_info"]["datetime_str"] # 表示用
+                "sec": b["seconds"],
+                "hms": b["sec_info"]["h_m_s"],
+                "datetime": b["datetime_info"]["datetime_str"],
             }
             for b in blocks
         ],

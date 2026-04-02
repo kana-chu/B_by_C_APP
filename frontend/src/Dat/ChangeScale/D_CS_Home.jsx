@@ -11,6 +11,7 @@
  */
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import L_Layout from "../../Styles/Layout/L_Layout";
 
 // Composite
@@ -46,7 +47,7 @@ export default function D_CS_Home() {
 
     // ▼ 計算設定
     const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+    //const [endDate, setEndDate] = useState("");
 
     const [calcStart, setCalcStart] = useState("");
     const [calcEnd, setCalcEnd] = useState("");
@@ -59,7 +60,20 @@ export default function D_CS_Home() {
     // ▼ 進行表示
     const [progress, setProgress] = useState(0);
     const [message, setMessage] = useState("計算実行前…");
+    // ▼ 計算中フラグ
+    const [isCalculating, setIsCalculating] = useState(false);
 
+
+    const navigate = useNavigate();
+
+    const handleGoHome = () => {
+        navigate("/");
+    };
+
+    const canInspect = !!(
+        path &&
+        startDate
+    );
 
     /** ▼ データ情報確定 */
     const handleInspect = async () => {
@@ -67,7 +81,6 @@ export default function D_CS_Home() {
         if (!startDate) return setMessage("データ範囲（開始）を入力してください");
 
         setMessage("データ情報取得中…");
-        setProgress(20);
 
         try {
             const data = await Mod_Api_Dat_Inspect({
@@ -78,14 +91,12 @@ export default function D_CS_Home() {
             const list = data.timeInfoList || [];
             setTimeInfoList(list);
 
-            // ★ SelectBox 用に label & value に変換
             const opts = list.map(t => ({
                 label: `${t.sec} 秒｜${t.hms}｜${t.datetime}`,
-                value: t.sec,    // ← value は秒だけ（内部計算に便利）
+                value: t.sec,
             }));
             setCalcOptions(opts);
 
-            setProgress(50);
             setMessage("データ情報読み取り完了");
 
         } catch (err) {
@@ -94,21 +105,32 @@ export default function D_CS_Home() {
         }
     };
 
+    const canSubmit = !!(
+        path &&
+        startDate &&
+        savePath &&
+        calcStart &&
+        calcEnd &&
+        multiplier &&
+        timeInfoList.length > 0 &&
+        !isCalculating
+    );
 
     /** ▼ 計算実行 */
     const handleSubmit = async () => {
         if (!path) return setMessage("元データファイルを選択してください");
         if (!savePath) return setMessage("保存先ファイルを作成してください");
 
+        setIsCalculating(true);   // ★ Progress 表示開始
+        setProgress(0);
         setMessage("計算実行中…");
-        setProgress(20);
 
         try {
             const data = await Mod_Api_Dat_ChangeScale({
                 file_path: path,
                 save_path: savePath,
                 start_date: startDate,
-                end_date: endDate,
+                //end_date: endDate,
                 calc_start: calcStart,
                 calc_end: calcEnd,
                 multiplier,
@@ -120,12 +142,15 @@ export default function D_CS_Home() {
         } catch (err) {
             console.error(err);
             setMessage("計算エラーが発生しました");
+
+        } finally {
+            setIsCalculating(false); // ★ 計算終了
         }
     };
 
 
     return (
-        <L_Layout title="datファイル等倍計算">
+        <L_Layout title="datファイル等倍計算" onHome={handleGoHome}>
 
             <div className="flex flex-col gap-8 w-full">
 
@@ -137,24 +162,36 @@ export default function D_CS_Home() {
                 />
 
                 {/* ▼ 日付範囲 */}
-                <div className="flex items-center gap-4">
+                {/* ▼ 日付範囲 */}
+                <div className="grid grid-cols-[3fr_0.5fr_5fr] items-start gap-4 w-full">
+
+                    {/* 開始 */}
                     <W_Com_LabelDateInput
                         label="② データ範囲（開始）"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                     />
-                    <span>〜</span>
+
+                    {/* 区切り：左寄せ
+                    <span className="text-left text-[var(--ui-text-sub)] mt-2">
+                        〜
+                    </span>
+
+                    {/* 終了
                     <W_Com_LabelDateInput
                         label="（終了）"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                     />
+                    */}
+
                 </div>
 
                 {/* ▼ データ情報確定 */}
                 <W_In_Button
                     label="③ データ情報確定"
                     onClick={handleInspect}
+                    disabled={!canInspect}
                 />
 
                 {/* ▼ 2カラム：左（55%）→一覧、右（45%）→計算設定 */}
@@ -215,16 +252,21 @@ export default function D_CS_Home() {
                 <div className="grid grid-cols-[7fr_3fr] gap-4 w-full items-start -mt-10">
 
                     <div className="flex flex-col gap-2 w-full">
-                        <W_Feed_Pro_Bar label="progress" value={progress} />
+                        {isCalculating && (
+                            <W_Feed_Pro_Bar
+                                label="progress"
+                                value={progress}
+                            />
+                        )}
                         <W_Feed_Mess_Message text={message} />
                     </div>
 
-                    <div className="flex justify-end w-full mt-8 pr-14">
-                        <W_In_Button
-                            label="⑧ 計算実行"
-                            onClick={handleSubmit}
-                        />
-                    </div>
+
+                    <W_In_Button
+                        label="⑧ 計算実行"
+                        onClick={handleSubmit}
+                        disabled={!canSubmit}
+                    />
 
                 </div>
 

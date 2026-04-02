@@ -15,16 +15,19 @@ export default function W_In_Button({
     onClick,
     type = "button",
     disableDuration = 800,
+    disabled: disabledFromProps = false, // ★ 追加
 }) {
-    const [disabled, setDisabled] = useState(false);
+    const [disabledInternal, setDisabledInternal] = useState(false);
+
+    const disabled = disabledFromProps || disabledInternal;
 
     const handleClickSafe = async (e) => {
         if (disabled) return;
-        setDisabled(true);
+        setDisabledInternal(true);
         try {
             await onClick?.(e);
         } finally {
-            setTimeout(() => setDisabled(false), disableDuration);
+            setTimeout(() => setDisabledInternal(false), disableDuration);
         }
     };
 
@@ -34,19 +37,22 @@ export default function W_In_Button({
             onClick={handleClickSafe}
             disabled={disabled}
             className={`
-                px-3.5 py-1.5 rounded-md transition font-meiryo
-                shadow-[0_1px_2px_rgba(0,0,0,0.05)]
-                ${
-                    disabled
-                        ? "bg-gray-400 text-white cursor-not-allowed"
-                        : `
-                            bg-[var(--ui-btn)]          /* ★ ミルクティー */
-                            hover:bg-[var(--ui-btn-hover)]
-                            text-[var(--ui-btn-text)]
-                            active:scale-95
-                        `
+                        px-3.5 py-1.5 rounded-md transition font-meiryo
+                        shadow-[0_1px_2px_rgba(0,0,0,0.05)]
+                        ${disabled
+                                    ? `
+                                    bg-[var(--ui-btn-disabled)]
+                                    text-[var(--ui-btn-disabled-text)]
+                                    cursor-not-allowed
+                                `
+                                    : `
+                                    bg-[var(--ui-btn)]
+                                    hover:bg-[var(--ui-btn-hover)]
+                                    text-[var(--ui-btn-text)]
+                                    active:scale-95
+                                `
                 }
-            `}
+    `}
         >
             {label}
         </button>

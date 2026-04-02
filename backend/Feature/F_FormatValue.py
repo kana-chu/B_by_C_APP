@@ -11,28 +11,34 @@
 
 import pandas as pd
 import math
+from decimal import Decimal, ROUND_HALF_UP
+
 
 def F_FormatValue(x):
-    # NaN → 空欄
+    """
+    ・None / NaN → 空文字
+    ・小数第3位で四捨五入
+    ・小数第2位表記
+    """
+
+    # NaN / None → 空欄
     if x is None or pd.isna(x):
         return ""
 
     # 数値化
     try:
-        xf = float(x)
-    except:
+        d = Decimal(str(x))
+    except Exception:
         return str(x)
 
-    # 小数1桁で切り上げ
-    rounded = math.ceil(xf * 10) / 10
+    # 小数第3位で四捨五入 → 小数第2位
+    rounded = d.quantize(
+        Decimal("0.00"),
+        rounding=ROUND_HALF_UP
+    )
 
-    # 整数表記 (例: 2.0 → "2")
-    if rounded.is_integer():
-        return str(int(rounded))
-
-    # 小数1桁の文字列
-    return f"{rounded:.1f}"
-
+    # 小数第2位固定表記
+    return f"{rounded:.2f}"
 
 # ========== テスト ==============
 if __name__ == "__main__":
