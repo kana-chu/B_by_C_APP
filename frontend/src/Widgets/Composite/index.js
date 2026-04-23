@@ -50,3 +50,4 @@ export { default as W_Com_LabelRadioGroup } from "./W_Com_LabelRadioGroup";
 export { default as W_Com_LabelToggle } from "./W_Com_LabelToggle";
 export { default as W_Com_FileOrFolderPicker} from "./W_Com_FileOrFolderPicker";
 export { default as W_Com_SaveFilePicker} from "./W_Com_SaveFilePicker";
+export { default as W_Com_LabelMultiSelectBox} from "./W_Com_LabelMultiSelectBox";

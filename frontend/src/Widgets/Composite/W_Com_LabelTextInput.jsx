@@ -3,15 +3,21 @@
  * @description
  *   上段にラベル、下段に「テキスト入力 + 単位」を横並びで配置する
  *   汎用コンポジット。
+
+ * @type:
+ *   - "text"  : 自由入力
+ *   - "int"   : 整数のみ
+ *   - "float" : 小数可
  */
 
 import { W_Dis_Label, W_Dis_Value } from "../Display";
-import { W_In_TextInput } from "../Inputs";
+import W_In_TextInput from "../Inputs/W_In_TextInput";
 
 export default function W_Com_LabelTextInput({
     label,
     value,
     onChange,
+    placeholder="", //グレーで入力例を表示
     unit = "",
     type = "text",
     maxLength = null,
@@ -46,6 +52,7 @@ export default function W_Com_LabelTextInput({
                 <W_In_TextInput
                     value={value}
                     onChange={handleChange}
+                    placeholder = {placeholder}
                     className="w-40"
                 />
 

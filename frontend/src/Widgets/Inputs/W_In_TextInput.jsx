@@ -12,14 +12,16 @@
 export default function W_In_TextInput({
     value = "",
     onChange,
+    placeholder = "",
     readOnly = false,
     className = "",
 }) {
     return (
         <input
             type="text"
-            value={value}
+            value={value === null || value === undefined ? "" : String(value)}
             onChange={onChange}
+            placeholder={placeholder}
             readOnly={readOnly}
             className={`
                         rounded-md px-2 py-1 shadow-sm

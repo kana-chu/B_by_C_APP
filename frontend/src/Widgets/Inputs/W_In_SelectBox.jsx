@@ -12,6 +12,11 @@ export default function W_In_SelectBox({
     onChange,
     styleWidth = "100%",
 }) {
+    // ----------------------------
+    // オプション正規化（最重要）
+    // ----------------------------
+    const safeOptions = Array.isArray(options) ? options : [];
+
     return (
         <div className="flex flex-col gap-1" style={{ width: styleWidth }}>
             {label && (
@@ -32,6 +37,7 @@ export default function W_In_SelectBox({
                 "
             >
                 {/* ★ Select 本体（角丸なし） */}
+
                 <select
                     value={value}
                     onChange={onChange}
@@ -39,22 +45,34 @@ export default function W_In_SelectBox({
                         appearance-none
                         w-full p-2 pr-10
                         bg-transparent
-                        rounded-none       /* ← 角丸禁止 */
+                        rounded-none
                         focus:outline-none
                     "
                 >
+                    {/* 初期選択 */}
                     <option value="">選択</option>
 
-                    {options.length === 0 && (
+                    {/* options が空 or 不正な場合 */}
+                    {safeOptions.length === 0 && (
                         <option value="" disabled>
                             選択肢がありません
                         </option>
                     )}
 
-                    {options.length > 0 &&
-                        options.map((opt, i) => (
+                    {/* 正常な options */}
+                    {safeOptions.map((opt, i) => {
+                        // opt の最低限バリデーション
+                        if (
+                            !opt ||
+                            typeof opt.value === "undefined" ||
+                            typeof opt.label === "undefined"
+                        ) {
+                            return null;
+                        }
+
+                        return (
                             <option
-                                key={opt.value}
+                                key={`${opt.value}-${i}`}
                                 value={opt.value}
                                 style={{
                                     backgroundColor:
@@ -65,15 +83,17 @@ export default function W_In_SelectBox({
                             >
                                 {opt.label}
                             </option>
-                        ))}
+                        );
+                    })}
                 </select>
+
 
                 {/* ★ ▼ 部分（こちらも角丸禁止） */}
                 <div
                     className="
                         absolute right-0 top-0 h-full w-8
                         flex items-center justify-center
-                        bg-[var(--ui-btn)] 
+                        bg-[var(--ui-btn)]
                         hover:bg-[var(--ui-btn-hover)]
                         text-[var(--ui-btn-text)]
                         rounded-none        /* ← 角丸禁止 */
