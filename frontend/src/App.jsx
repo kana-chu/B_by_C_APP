@@ -25,6 +25,8 @@ import P_CM_Home from "@/Pages/CreateMesh/P_CM_Home";
 import P_CC_Home from "@/Pages/CalcCensus/P_CC_Home";
 import P_CC_E_Home from "@/Pages/CalcCensus/Economic/P_CC_E_Home";
 import P_CC_N_Home from "@/Pages/CalcCensus/National/P_CC_N_Home";
+import P_CC_ECSV_Home from "@/Pages/CalcCensus/EconomicForCSV/P_CC_ECSV_Home";
+import P_CC_NCSV_Home from "@/Pages/CalcCensus/NationalForCSV/P_CC_NCSV_Home";
 import W_Dis_LoadingScreen from "@/Widgets/Display/W_Dis_LoadingScreen";
 
 export default function App() {
@@ -69,6 +71,11 @@ export default function App() {
                 <Route path="/calc-census/economic" element={<P_CC_E_Home />} />
                 {/*　国勢調査　*/}
                 <Route path="/calc-census/national" element={<P_CC_N_Home />} />
+
+                {/*　経済センサス　*/}
+                <Route path="/calc-census/economic-for-csv" element={<P_CC_ECSV_Home />} />
+                {/*　国勢調査　*/}
+                <Route path="/calc-census/national-for-csv" element={<P_CC_NCSV_Home />} />
 
             </Routes>
         </HashRouter >

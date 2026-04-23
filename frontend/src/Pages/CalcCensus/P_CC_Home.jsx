@@ -113,6 +113,18 @@ export default function P_CC_Home() {
                     onClick={() => navigate("/calc-census/economic")}
                 />
 
+                {/* ▼ 国勢調査 (csv出力) への遷移ボタン */}
+                <W_In_Button
+                    label="国勢調査 (csv出力)"
+                    onClick={() => navigate("/calc-census/national-for-csv")}
+                />
+
+                {/* ▼ 経済センサス (csv出力) への遷移ボタン */}
+                <W_In_Button
+                    label="経済センサス (csv出力)"
+                    onClick={() => navigate("/calc-census/economic-for-csv")}
+                />
+
             </div>
 
         </L_Layout>
