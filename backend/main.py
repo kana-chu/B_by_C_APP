@@ -11,7 +11,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # 各 Router を import
-from Router.route_dat import router as dat_router
+from Router.route_createMesh import router as create_mesh
+from Router.route_calcCensus import router as calc_census
 
 # --------------------------------------------------
 # FastAPI アプリ生成
@@ -36,7 +37,8 @@ app.add_middleware(
 # --------------------------------------------------
 # Router 登録
 # --------------------------------------------------
-app.include_router(dat_router)
+app.include_router(create_mesh)
+app.include_router(calc_census)
 
 # --------------------------------------------------
 # ヘルスチェック用

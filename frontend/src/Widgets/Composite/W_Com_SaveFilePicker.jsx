@@ -6,11 +6,9 @@
  *   Electron の「名前を付けて保存ダイアログ」を使用して
  *   保存ファイルの絶対パスを取得するコンポーネント。
  *   既存ファイルと同名の場合は警告を表示する。
- *
- * @export default
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { W_In_TextInput, W_In_Button } from "../Inputs";
 import { W_Dis_Label } from "../Display";
 
@@ -19,14 +17,24 @@ export default function W_Com_SaveFilePicker({
     value = "",
     onChange,
     defaultName = "untitled.dat",
+    saved = false,          // ★ 追加：保存完了フラグ
 }) {
-    const [warning, setWarning] = useState("");
+    const [message, setMessage] = useState("");
 
     const checkExists = async (path) => {
         if (!window.electronAPI?.checkExists) return false;
         const res = await window.electronAPI.checkExists(path);
         return res.exists;
     };
+
+    // ==================================================
+    // 保存完了状態に応じて表示を切り替える
+    // ==================================================
+    useEffect(() => {
+        if (saved && value) {
+            setMessage("保存が完了しました");
+        }
+    }, [saved, value]);
 
     const handleSelect = async () => {
         if (!window.electronAPI?.saveDialog) {
@@ -39,14 +47,14 @@ export default function W_Com_SaveFilePicker({
 
         const exists = await checkExists(selectedPath);
 
-        // ※ 選択時点ではファイル内容は書き換わらない
-        setWarning(
+        // ★ 選択のたびに必ずメッセージを更新する
+        setMessage(
             exists
                 ? "既存ファイルが選択されています（計算実行時に上書きされます）"
                 : "新しい保存ファイルが選択されています"
         );
 
-        // 同一パス再選択でも再描画させる
+        // 同一パス再選択でも再評価させる
         onChange("");
         setTimeout(() => {
             onChange(selectedPath);
@@ -66,9 +74,9 @@ export default function W_Com_SaveFilePicker({
                 <W_In_Button label="選択" onClick={handleSelect} />
             </div>
 
-            {/* ▼ 警告表示エリア（高さは常に確保） */}
+            {/* ▼ メッセージ表示エリア（高さは常に確保） */}
             <div className="min-h-[1.0rem]">
-                {warning && (
+                {message && (
                     <div
                         className="
                             text-xs
@@ -76,7 +84,7 @@ export default function W_Com_SaveFilePicker({
                             text-[var(--ui-text)]
                         "
                     >
-                        {warning}
+                        {message}
                     </div>
                 )}
             </div>

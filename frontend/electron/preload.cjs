@@ -30,6 +30,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
     },
 
     /* -----------------------------
+        ファイル書き込み（実処理）　→　バックエンド実行のため削除
+    ----------------------------- */
+    // writeFile: (filePath, content) => {
+    //     return ipcRenderer.invoke("write-file", {
+    //         filePath,
+    //         content,
+    //     });
+    // },
+
+    /* -----------------------------
         ファイル存在チェック
     ----------------------------- */
     checkExists: (path) => {

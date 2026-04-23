@@ -18,11 +18,14 @@
  * @export default
  */
 import { useEffect, useState } from "react";
-import { HashRouter , Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 
-import Home from "./Home";
-import D_CS_Home from "./Dat/ChangeScale/D_CS_Home";
-import W_Dis_LoadingScreen from "./Widgets/Display/W_Dis_LoadingScreen";
+import Home from "@/Home";
+import P_CM_Home from "@/Pages/CreateMesh/P_CM_Home";
+import P_CC_Home from "@/Pages/CalcCensus/P_CC_Home";
+import P_CC_E_Home from "@/Pages/CalcCensus/Economic/P_CC_E_Home";
+import P_CC_N_Home from "@/Pages/CalcCensus/National/P_CC_N_Home";
+import W_Dis_LoadingScreen from "@/Widgets/Display/W_Dis_LoadingScreen";
 
 export default function App() {
 
@@ -54,7 +57,19 @@ export default function App() {
         <HashRouter>
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/dat/change-scale" element={<D_CS_Home />} />
+
+                {/*　メッシュ作成　*/}
+                <Route path="/create-mesh" element={<P_CM_Home />} />
+
+                {/*　センサス計算　*/}
+                {/*　ホーム　*/}
+                <Route path="/calc-census" element={<P_CC_Home />} />
+
+                {/*　経済センサス　*/}
+                <Route path="/calc-census/economic" element={<P_CC_E_Home />} />
+                {/*　国勢調査　*/}
+                <Route path="/calc-census/national" element={<P_CC_N_Home />} />
+
             </Routes>
         </HashRouter >
     );
