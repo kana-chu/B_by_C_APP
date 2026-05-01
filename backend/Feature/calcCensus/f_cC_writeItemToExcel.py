@@ -10,6 +10,7 @@
 import pandas as pd
 import numpy as np
 
+
 def f_cC_writeItemToExcel(
     file_path: str,
     item_write_tasks: dict,
@@ -26,7 +27,9 @@ def f_cC_writeItemToExcel(
         }
     """
 
-    # --- すべての item シートを読み込む ---
+    # --------------------------------------------------
+    # 1. すべての item シートを読み込む
+    # --------------------------------------------------
     item_dfs = {
         item_name: pd.read_excel(
             file_path,
@@ -37,18 +40,30 @@ def f_cC_writeItemToExcel(
         for item_name in item_write_tasks.keys()
     }
 
-    # --- NumPy でまとめて反映 ---
+    # --------------------------------------------------
+    # 2. NumPy でまとめて反映
+    # --------------------------------------------------
     for item_name, tasks in item_write_tasks.items():
         arr = item_dfs[item_name].to_numpy()
 
         for row_idx, col_idx, value in tasks:
             if value is None:
                 continue
-            arr[np.ix_(row_idx, col_idx)] = value
+
+            # ✅ 数値に変換できる場合のみ代入
+            try:
+                numeric_value = float(value)
+            except (TypeError, ValueError):
+                # "*" など数値にできないものは保持（何もしない）
+                continue
+
+            arr[np.ix_(row_idx, col_idx)] = numeric_value
 
         item_dfs[item_name] = pd.DataFrame(arr)
 
-    # --- ExcelWriter を 1 回だけ開く（★最重要） ---
+    # --------------------------------------------------
+    # 3. ExcelWriter を 1 回だけ開いて書き戻す
+    # --------------------------------------------------
     with pd.ExcelWriter(
         file_path,
         engine="openpyxl",
@@ -65,4 +80,5 @@ def f_cC_writeItemToExcel(
                 index=False,
                 header=False,
             )
-        print(f"保存中")
+
+        print("保存中")

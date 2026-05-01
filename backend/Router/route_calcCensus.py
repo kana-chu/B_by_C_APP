@@ -3,7 +3,7 @@
 @folder backend/Router
 @category API
 @description
-    国勢調査・経済センサス 共用 Census 計算 API
+    国勢調査・経済センサス 共用 Census 計算 API (excel高速版)
     ※ 入力値はすべてフロントから受け取る（規定値なし）
 """
 
@@ -30,6 +30,7 @@ from Feature.calcCensus.f_cC_multiplyPercentage import f_cC_multiplyPercentage
 from Feature.calcCensus.f_cC_readXlsxSheetName import f_cC_readXlsxSheetName
 from Feature.calcCensus.f_cC_copyMeshHeaderStyle import f_cC_copyMeshHeaderStyle
 from Feature.calcCensus.f_cC_fillZeroCellsGray import f_cC_fillZeroCellsGray
+from Feature.calcCensus.f_cC_run_fast import f_cC_run_fast
 
 print("🔥🔥🔥 ROUTE_CALC_CENSUS (FRONT-DRIVEN) LOADED 🔥🔥🔥", __file__)
 
@@ -147,8 +148,7 @@ def calc_census(req: CalcCensusRequest = Depends(get_calc_census_request)):
         )
         rate_vals = rate_df.iloc[4:, 4:].to_numpy(dtype=float)
 
-        from Feature.calcCensus.f_cC_run_fast import f_cC_run_fast
-
+        print("f_cC_run_fastするはず")
         f_cC_run_fast(
             df=df,
             df_mesh=df_mesh,
@@ -160,21 +160,21 @@ def calc_census(req: CalcCensusRequest = Depends(get_calc_census_request)):
         # ==================================================
         # 5. 見た目整形
         # ==================================================
-        yield from send("🧾 見出し・罫線整形中…", 85)
-        f_cC_copyMeshHeaderStyle(
-            file_path=req.save_path,
-            item_sheetNames=[i["sheetName"] for i in item_list],
-            exMeshSize=int(req.ex_meshSize),
-        )
+        # yield from send("🧾 見出し・罫線整形中…", 85)
+        # f_cC_copyMeshHeaderStyle(
+        #     file_path=req.save_path,
+        #     item_sheetNames=[i["sheetName"] for i in item_list],
+        #     exMeshSize=int(req.ex_meshSize),
+        # )
 
         # ==================================================
         # 6. 0埋め・着色
         # ==================================================
-        yield from send("🎨 空セルを0で埋めています…", 95)
-        f_cC_fillZeroCellsGray(
-            file_path=req.save_path,
-            sheet_names=[i["sheetName"] for i in item_list],
-        )
+        # yield from send("🎨 空セルを0で埋めています…", 95)
+        # f_cC_fillZeroCellsGray(
+        #     file_path=req.save_path,
+        #     sheet_names=[i["sheetName"] for i in item_list],
+        # )
 
         # ==================================================
         # 完了

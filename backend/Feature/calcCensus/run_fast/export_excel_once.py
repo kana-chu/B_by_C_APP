@@ -11,20 +11,14 @@ def export_excel_once(
     """
     完成データを Excel に一括書き込み
     """
-
-    wb = load_workbook(file_path)
-
     with pd.ExcelWriter(
         file_path,
         engine="openpyxl",
         mode="a",
         if_sheet_exists="replace",
     ) as writer:
-        writer.book = wb
-
         for sheet, arr in data.items():
-            df_out = pd.DataFrame(arr)
-            df_out.to_excel(
+            pd.DataFrame(arr).to_excel(
                 writer,
                 sheet_name=sheet,
                 index=False,

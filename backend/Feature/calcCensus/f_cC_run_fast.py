@@ -7,9 +7,11 @@ from Feature.calcCensus.run_fast.export_excel_once import export_excel_once
 
 
 def f_cC_run_fast(df, df_mesh, rate_vals, item_list, req):
+    print("f_cC_run_fast")
     """
     高速ルート：完成データを作ってから Excel 保存1回
     """
+    print(df)
 
     data = build_mesh_data(df, df_mesh, item_list, req)
     data = apply_percentage(data, rate_vals)

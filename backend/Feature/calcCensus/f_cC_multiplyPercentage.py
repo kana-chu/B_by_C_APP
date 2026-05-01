@@ -5,6 +5,12 @@
 @description
     割合シートを基に、複数 item シートへ割合掛けを行い、
     ExcelWriter を 1 回だけ使用して一括で書き戻す（最速）
+
+    前提仕様：
+      - 各シートは 4行4列をヘッダ領域として持つ
+      - 割合は [4:, 4:] のデータ領域にのみ適用する
+      - 行数・列数が完全一致しない場合でもエラーにしない
+      - 数値に変換できないセル（*, 空白 等）はそのまま保持する
 """
 
 import pandas as pd
@@ -18,7 +24,9 @@ def f_cC_multiplyPercentage(
 ):
     print("📈 割合掛け（高速版）開始")
 
-    # --- 割合シート読み込み（1回だけ） ---
+    # ==================================================
+    # 1. 割合シート読み込み（1回）
+    # ==================================================
     df_rate = pd.read_excel(
         file_path,
         sheet_name=percentage_sheetName,
@@ -27,8 +35,11 @@ def f_cC_multiplyPercentage(
     )
 
     rate_vals = df_rate.iloc[4:, 4:].to_numpy(dtype=float)
+    rate_h, rate_w = rate_vals.shape
 
-    # --- itemシートを全部読む ---
+    # ==================================================
+    # 2. item シート読み込み
+    # ==================================================
     print("各項目のシート読み込み中...")
     item_dfs = {
         name: pd.read_excel(
@@ -40,18 +51,38 @@ def f_cC_multiplyPercentage(
         for name in item_sheetNames
     }
 
-    # --- 計算 ---
+    # ==================================================
+    # 3. 割合計算（数値セルのみ）
+    # ==================================================
     for name, df_item in item_dfs.items():
-        print(f"  {df_item}計算中: {name}")
-        arr = df_item.to_numpy(dtype=float, copy=True)
+        print(f"  ├─ 計算中: {name}")
 
-        with np.errstate(invalid="ignore"):
-            arr[4:, 4:] = arr[4:, 4:] * rate_vals
+        # object 配列として保持（文字を壊さない）
+        arr = df_item.to_numpy(dtype=object, copy=True)
 
+        data = arr[4:, 4:]
+        data_h, data_w = data.shape
+
+        h = min(data_h, rate_h)
+        w = min(data_w, rate_w)
+
+        for i in range(h):
+            for j in range(w):
+                try:
+                    val = float(data[i, j])
+                except (TypeError, ValueError):
+                    # "*" 等はそのまま
+                    continue
+
+                data[i, j] = val * rate_vals[i, j]
+
+        arr[4:, 4:] = data
         item_dfs[name] = pd.DataFrame(arr)
 
-    # --- ★ExcelWriter 1回だけ ---
-    print(f"excelに書き込み中")
+    # ==================================================
+    # 4. Excel へ一括書き戻し
+    # ==================================================
+    print("excelに書き込み中")
     with pd.ExcelWriter(
         file_path,
         engine="openpyxl",
@@ -69,6 +100,6 @@ def f_cC_multiplyPercentage(
                 header=False,
             )
 
-        print(f"保存中")
+        print("保存中")
 
     print("✅ 割合掛け（高速版）完了")

@@ -3,7 +3,7 @@
 @folder backend/Router
 @category API
 @description
-    国勢調査・経済センサス 共用 Census 計算 API
+    国勢調査・経済センサス 共用 Census 計算 API (遅い版)
     ※ 入力値はすべてフロントから受け取る（規定値なし）
 """
 
@@ -31,7 +31,7 @@ from Feature.calcCensus.f_cC_readXlsxSheetName import f_cC_readXlsxSheetName
 from Feature.calcCensus.f_cC_copyMeshHeaderStyle import f_cC_copyMeshHeaderStyle
 from Feature.calcCensus.f_cC_fillZeroCellsGray import f_cC_fillZeroCellsGray
 
-print("🔥🔥🔥 ROUTE_CALC_CENSUS (FRONT-DRIVEN) LOADED 🔥🔥🔥", __file__)
+print("🔥🔥🔥 ROUTE_CALC_CENSUS_sepa_s (FRONT-DRIVEN) LOADED 🔥🔥🔥", __file__)
 
 router = APIRouter(prefix="/calc-census", tags=["calc-census"])
 
@@ -230,55 +230,55 @@ def calc_census(req: CalcCensusRequest = Depends(get_calc_census_request)):
         # ============================================
         # 6. 見た目整形（シート別進捗）
         # ============================================
-        start_p, end_p = 85, 95
-        total = len(item_names)
-        step = (end_p - start_p) / total
+        # start_p, end_p = 85, 95
+        # total = len(item_names)
+        # step = (end_p - start_p) / total
 
-        current = start_p
-        yield from send(f"計算開始時刻：{start_time:%Y-%m-%d %H:%M:%S}\n🧾 見出し・罫線を整えます…", current)
+        # current = start_p
+        # yield from send(f"計算開始時刻：{start_time:%Y-%m-%d %H:%M:%S}\n🧾 見出し・罫線を整えます…", current)
 
-        for idx, sheet in enumerate(item_names, start=1):
-            yield from send(
-                f"🧾 整形中：{sheet}（{idx}/{total}）",
-                current,
-            )
-            f_cC_copyMeshHeaderStyle(
-                file_path=req.save_path,
-                item_sheetNames=[sheet],  # ★ 1枚ずつ
-                exMeshSize=int(req.ex_meshSize),
-            )
+        # for idx, sheet in enumerate(item_names, start=1):
+        #     yield from send(
+        #         f"🧾 整形中：{sheet}（{idx}/{total}）",
+        #         current,
+        #     )
+        #     f_cC_copyMeshHeaderStyle(
+        #         file_path=req.save_path,
+        #         item_sheetNames=[sheet],  # ★ 1枚ずつ
+        #         exMeshSize=int(req.ex_meshSize),
+        #     )
 
-            current = start_p + round(step * idx)
-            if current > end_p:
-                current = end_p
+        #     current = start_p + round(step * idx)
+        #     if current > end_p:
+        #         current = end_p
 
-        yield from send(f"計算開始時刻：{start_time:%Y-%m-%d %H:%M:%S}\n🧾 見出し・罫線を整えました", end_p)
+        # yield from send(f"計算開始時刻：{start_time:%Y-%m-%d %H:%M:%S}\n🧾 見出し・罫線を整えました", end_p)
 
         # ============================================
         # 7. 0埋め・着色（シート別進捗）
         # ============================================
-        start_p, end_p = 95, 100
-        total = len(item_names)
-        step = (end_p - start_p) / total
+        # start_p, end_p = 95, 100
+        # total = len(item_names)
+        # step = (end_p - start_p) / total
 
-        current = start_p
-        yield from send(f"計算開始時刻：{start_time:%Y-%m-%d %H:%M:%S}\n🎨 空セルを0で埋めます…", current)
+        # current = start_p
+        # yield from send(f"計算開始時刻：{start_time:%Y-%m-%d %H:%M:%S}\n🎨 空セルを0で埋めます…", current)
 
-        for idx, sheet in enumerate(item_names, start=1):
-            yield from send(
-                f"🎨 空セル処理中：{sheet}（{idx}/{total}）",
-                current,
-            )
-            f_cC_fillZeroCellsGray(
-                file_path=req.save_path,
-                sheet_names=[sheet],  # ★ 1枚ずつ
-            )
+        # for idx, sheet in enumerate(item_names, start=1):
+        #     yield from send(
+        #         f"🎨 空セル処理中：{sheet}（{idx}/{total}）",
+        #         current,
+        #     )
+        #     f_cC_fillZeroCellsGray(
+        #         file_path=req.save_path,
+        #         sheet_names=[sheet],  # ★ 1枚ずつ
+        #     )
 
-            current = start_p + round(step * idx)
-            if current > end_p:
-                current = end_p
+        #     current = start_p + round(step * idx)
+        #     if current > end_p:
+        #         current = end_p
 
-        yield from send(f"計算開始時刻：{start_time:%Y-%m-%d %H:%M:%S}\n🎨 全空セルを0で埋めました", end_p)
+        # yield from send(f"計算開始時刻：{start_time:%Y-%m-%d %H:%M:%S}\n🎨 全空セルを0で埋めました", end_p)
 
         # ============================================
         # 完了

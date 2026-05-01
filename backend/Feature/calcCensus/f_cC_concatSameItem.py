@@ -7,14 +7,15 @@
     NumPy / pandas により高速に縦結合する。
 
     economicMeshSize:
-      - 500 → C D E F
-      - 250 → C D E F G
+        - 500 → C D E F
+        - 250 → C D E F G
 """
 
 import os
 import pandas as pd
-import numpy as np
 from openpyxl.utils import column_index_from_string
+
+from Feature.calcCensus.f_cC_normalizeHeader import f_cC_normalizeHeader
 
 
 def f_cC_concatSameItem(
@@ -60,36 +61,32 @@ def f_cC_concatSameItem(
         df_raw = pd.read_excel(
             file_path,
             sheet_name=sheet_name,
-            header=0,      # 1行目をヘッダーとして読む
+            header=0,
             engine="openpyxl",
         )
 
-        # ---------- 共通列（NumPy slice） ----------
         base_df = df_raw.iloc[:, base_idx]
-
-        # ---------- item 列 ----------
         item_df = pd.DataFrame()
 
         for item in item_defs:
-            actual_header = df_raw.columns[item["idx"]]
-            if actual_header != item["header"]:
+            actual = f_cC_normalizeHeader(df_raw.columns[item["idx"]])
+            expected = f_cC_normalizeHeader(item["header"])
+
+            if actual != expected:
                 print(
                     f"⛔ 不一致: {sheet_name} / {item['name']} "
-                    f"{actual_header} != {item['header']}"
+                    f"{actual} != {expected}"
                 )
                 continue
 
             item_df[item["name"]] = df_raw.iloc[:, item["idx"]]
 
-        # ---------- 結合 ----------
-        df_list.append(
-            pd.concat([base_df, item_df], axis=1)
-        )
+        df_list.append(pd.concat([base_df, item_df], axis=1))
 
     if not df_list:
         return pd.DataFrame()
 
     result = pd.concat(df_list, ignore_index=True)
-
     print("✅ concat 完了")
+
     return result
