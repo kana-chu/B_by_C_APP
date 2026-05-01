@@ -208,9 +208,31 @@ ipcMain.handle("save-dialog", async (_, defaultName) => {
     return filePath;
 });
 
-ipcMain.handle("check-exists", async (_, p) => ({
-    exists: fs.existsSync(p),
-}));
+ipcMain.handle("select-folder", async () => {
+    const result = await dialog.showOpenDialog({
+        properties: ["openDirectory"],
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+        return null;
+    }
+
+    return result.filePaths[0];
+});
+
+
+ipcMain.handle("check-exists", async (event, path) => {
+    try {
+        return {
+            exists: fs.existsSync(path),
+        };
+    } catch (e) {
+        return {
+            exists: false,
+        };
+    }
+});
+
 
 /* =====================================================
  * lifecycle（完全終了保証）

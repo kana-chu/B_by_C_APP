@@ -77,6 +77,31 @@ export default function P_CC_E_Home() {
     );
 
     // -------------------------------------
+    // ✅ 元データファイル変更時：関連 state を全クリア
+    // -------------------------------------
+    useEffect(() => {
+        // ファイルが未選択なら何もしない
+        if (!filePath) return;
+
+        // inspect結果
+        setSheetNameList([]);
+        setSheetNameOptions([]);
+
+        // 選択状態
+        setRateSheet("");
+        setItemSheet("");
+        setDataSheetList([]);
+
+        if (!isCalculating) {
+            setSavePath("");
+        }
+
+
+        // プレビュー
+        setItemList([]);
+    }, [filePath]);
+
+    // -------------------------------------
     // ✅ SSE Hook
     // -------------------------------------
     const {
@@ -192,7 +217,7 @@ export default function P_CC_E_Home() {
                 />
 
                 <W_In_Button
-                    label="ファイル決定、内容読み込み"
+                    label="② ファイル決定、内容読み込み"
                     onClick={handleInspect}
                     disabled={!canInspect}
                 />
@@ -207,14 +232,14 @@ export default function P_CC_E_Home() {
 
                     <div className="flex flex-col gap-6 w-full">
                         <W_Com_LabelSelectBox
-                            label="④ 割合シート選択"
+                            label="③ 割合シート選択"
                             value={rateSheet}
                             onChange={setRateSheet}
                             options={sheetNameOptions}
                         />
 
                         <W_Com_LabelSelectBox
-                            label="④ 項目シート選択"
+                            label="④ 項目指定シート選択"
                             value={itemSheet}
                             onChange={setItemSheet}
                             options={sheetNameOptions}
@@ -227,7 +252,7 @@ export default function P_CC_E_Home() {
                         />
 
                         <W_Com_LabelMultiSelectBox
-                            label="経済センサスデータシート選択"
+                            label="⑤ 経済センサスデータシート選択"
                             values={dataSheetList}
                             onChange={setDataSheetList}
                             options={sheetNameOptions}
@@ -236,38 +261,38 @@ export default function P_CC_E_Home() {
                 </div>
 
                 <W_Com_LabelSelectBox
-                    label="経済センサスデータメッシュサイズ"
+                    label="⑥ 経済センサスデータメッシュサイズ"
                     value={censusMeshSize}
                     onChange={setCensusMeshSize}
                     options={CalcOptions.economicMeshSize.options}
                 />
 
                 <W_Com_LabelSelectBox
-                    label="出力メッシュサイズ選択"
+                    label="⑦ 出力メッシュサイズ選択"
                     value={exMeshSize}
                     onChange={setExMeshSize}
                     options={CalcOptions.exMeshSize.options}
                 />
 
                 <W_Com_SaveFilePicker
-                    label="保存データファイル選択"
+                    label="⑧ 保存データファイル選択"
                     value={savePath}
                     onChange={setSavePath}
                     defaultName="new.xlsx"
                 />
 
                 <W_In_Button
-                    label="計算実行"
+                    label="⑨ 計算実行"
                     onClick={handleSubmit}
                     disabled={!canSubmit}
                 />
 
                 {/* ✅ 進捗 & メッセージ */}
                 <div className="flex flex-col gap-2 w-full">
-                        <W_Feed_Pro_Bar
-                            label="progress"
-                            value={progress}
-                        />
+                    <W_Feed_Pro_Bar
+                        label="progress"
+                        value={progress}
+                    />
                     <W_Feed_Mess_Message text={message} />
                 </div>
             </div>

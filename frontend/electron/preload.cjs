@@ -4,7 +4,8 @@
  * @category Electron
  * @description
  *   Renderer（React）から Electron IPC を安全に利用するための橋渡し。
- *   - File / Save dialog
+ *   - File / Folder dialog
+ *   - Save dialog
  *   - File exists check
  *   - electron-ready 通知
  */
@@ -16,28 +17,27 @@ const { contextBridge, ipcRenderer } = require("electron");
  * ===================================================== */
 contextBridge.exposeInMainWorld("electronAPI", {
     /* -----------------------------
-        ファイル/フォルダ選択
+        ファイル選択（既存）
+        - mode = "file" | "folder"
     ----------------------------- */
     selectFile: (mode = "file") => {
         return ipcRenderer.invoke("select-file", mode);
     },
 
     /* -----------------------------
-        保存ダイアログ
+        ✅ フォルダ選択（CSV 高速モード用・新規）
+        - フォルダパスのみ返す
+    ----------------------------- */
+    selectFolder: () => {
+        return ipcRenderer.invoke("select-folder");
+    },
+
+    /* -----------------------------
+        保存ダイアログ（既存・Excel 用）
     ----------------------------- */
     saveDialog: (defaultName) => {
         return ipcRenderer.invoke("save-dialog", defaultName);
     },
-
-    /* -----------------------------
-        ファイル書き込み（実処理）　→　バックエンド実行のため削除
-    ----------------------------- */
-    // writeFile: (filePath, content) => {
-    //     return ipcRenderer.invoke("write-file", {
-    //         filePath,
-    //         content,
-    //     });
-    // },
 
     /* -----------------------------
         ファイル存在チェック
@@ -48,13 +48,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
     /* -----------------------------
         Electron ready 通知
-        - main.cjs から send("electron-ready")
-        - React 側で onReady(callback)
     ----------------------------- */
     onReady: (callback) => {
         if (typeof callback !== "function") return;
 
-        // 1回だけ発火させたい場合は once
         const handler = () => callback();
         ipcRenderer.once("electron-ready", handler);
     },

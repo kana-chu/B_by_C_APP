@@ -1,60 +1,50 @@
 /**
- * @component W_Com_SaveFilePicker
+ * @component W_Com_SaveFolderPicker
  * @folder Widgets/Composite
  * @category Composite
  * @description
- *   Electron の「名前を付けて保存ダイアログ」を使用して
- *   保存ファイルの絶対パスを取得するコンポーネント。
- *   既存ファイルと同名の場合は警告を表示する。
+ *   Electron の「フォルダ選択ダイアログ」を使用して
+ *   出力先フォルダの絶対パスを取得するコンポーネント。
+ *   CSV 高速モード向け。
  */
 
 import { useEffect, useState } from "react";
 import { W_In_TextInput, W_In_Button } from "../Inputs";
 import { W_Dis_Label } from "../Display";
 
-export default function W_Com_SaveFilePicker({
-    label = "保存ファイル",
+export default function W_Com_SaveFolderPicker({
+    label = "出力先フォルダ",
     value = "",
     onChange,
-    defaultName = "untitled.dat",
-    saved = false,          // ★ 追加：保存完了フラグ
+    saved = false,      // 保存完了フラグ（CSV生成完了）
 }) {
     const [message, setMessage] = useState("");
 
-    const checkExists = async (path) => {
-        if (!window.electronAPI?.checkExists) return false;
-        const res = await window.electronAPI.checkExists(path);
-        return res.exists;
-    };
-
     // ==================================================
-    // 保存完了状態に応じて表示を切り替える
+    // 保存完了状態
     // ==================================================
     useEffect(() => {
         if (saved && value) {
-            setMessage("保存が完了しました");
+            setMessage("CSV ファイルの出力が完了しました");
         }
     }, [saved, value]);
 
+    // ==================================================
+    // フォルダ選択
+    // ==================================================
     const handleSelect = async () => {
-        if (!window.electronAPI?.saveDialog) {
-            console.error("Electron saveDialog がありません");
+        if (!window.electronAPI?.selectFolder) {
+            console.error("Electron selectFolder がありません");
             return;
         }
 
-        const selectedPath = await window.electronAPI.saveDialog(defaultName);
-        if (!selectedPath) return;
+        const selectedDir = await window.electronAPI.selectFolder();
+        if (!selectedDir) return;
 
-        const exists = await checkExists(selectedPath);
+        setMessage("出力先フォルダが選択されています");
 
-        setMessage(
-            exists
-                ? "既存ファイルが選択されています（計算実行時に上書きされます）"
-                : "新しい保存ファイルが選択されています"
-        );
-
-        // ✅ そのままセットする
-        onChange(selectedPath);
+        // 同一パス再選択でも onChange を発火させる
+        onChange(selectedDir);
     };
 
     return (
@@ -70,7 +60,7 @@ export default function W_Com_SaveFilePicker({
                 <W_In_Button label="選択" onClick={handleSelect} />
             </div>
 
-            {/* ▼ メッセージ表示エリア（高さは常に確保） */}
+            {/* ▼ メッセージ表示エリア（常に高さ確保） */}
             <div className="min-h-[1.0rem]">
                 {message && (
                     <div

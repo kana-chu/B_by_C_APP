@@ -23,6 +23,7 @@ import {
     W_Com_LabelSelectBox,
     W_Com_FileOrFolderPicker,
     W_Com_SaveFilePicker,
+    W_Com_SaveFolderPicker,
     W_Com_LabelMultiSelectBox,
 } from "@/Widgets/Composite";
 
@@ -40,7 +41,7 @@ import { F_Api_CC_SheetNameInspect } from "@/Feature/Api/CalcCensus/F_Api_CC_She
 import { F_Api_CC_SheetItemInspect } from "@/Feature/Api/CalcCensus/F_Api_CC_SheetItemInspect";
 
 // ✅ SSE Hook
-import { useCalcCensusSSE } from "@/Feature/Hooks/CalcCensus/useCalcCensusSSE";
+import { useCalcCensusSSE_CSV } from "@/Feature/Hooks/CalcCensus/useCalcCensusSSE_CSV";
 
 // Help
 import P_CC_E_Help from "@/Pages/CalcCensus/Economic/P_CC_E_Help";
@@ -83,8 +84,8 @@ export default function P_CC_ECSV_Home() {
         message,
         progress,
         isCalculating,
-        startCalc,
-    } = useCalcCensusSSE();
+        startCalcCSV,
+    } = useCalcCensusSSE_CSV();
 
     // -------------------------------------
     // inspect 可否
@@ -162,7 +163,7 @@ export default function P_CC_ECSV_Home() {
     const handleSubmit = () => {
         if (!savePath) return;
 
-        startCalc({
+        startCalcCSV({
             file_path: filePath,
             rate_sheet: rateSheet,
             item_sheet: itemSheet,
@@ -178,7 +179,7 @@ export default function P_CC_ECSV_Home() {
     // -------------------------------------
     return (
         <L_Layout
-            title="経済センサス計算"
+            title="経済センサス計算 (CSV出力)"
             onHome={handleGoHome}
             onBack={handleGoBefore}
             extraWindowContent={<P_CC_E_Help />}
@@ -192,7 +193,7 @@ export default function P_CC_ECSV_Home() {
                 />
 
                 <W_In_Button
-                    label="ファイル決定、内容読み込み"
+                    label="② ファイル決定、内容読み込み"
                     onClick={handleInspect}
                     disabled={!canInspect}
                 />
@@ -207,7 +208,7 @@ export default function P_CC_ECSV_Home() {
 
                     <div className="flex flex-col gap-6 w-full">
                         <W_Com_LabelSelectBox
-                            label="④ 割合シート選択"
+                            label="③ 割合シート選択"
                             value={rateSheet}
                             onChange={setRateSheet}
                             options={sheetNameOptions}
@@ -227,7 +228,7 @@ export default function P_CC_ECSV_Home() {
                         />
 
                         <W_Com_LabelMultiSelectBox
-                            label="経済センサスデータシート選択"
+                            label="⑤ 経済センサスデータシート選択"
                             values={dataSheetList}
                             onChange={setDataSheetList}
                             options={sheetNameOptions}
@@ -236,38 +237,42 @@ export default function P_CC_ECSV_Home() {
                 </div>
 
                 <W_Com_LabelSelectBox
-                    label="経済センサスデータメッシュサイズ"
+                    label="⑥ 経済センサスデータメッシュサイズ"
                     value={censusMeshSize}
                     onChange={setCensusMeshSize}
                     options={CalcOptions.economicMeshSize.options}
                 />
 
                 <W_Com_LabelSelectBox
-                    label="出力メッシュサイズ選択"
+                    label="⑦ 出力メッシュサイズ選択"
                     value={exMeshSize}
                     onChange={setExMeshSize}
                     options={CalcOptions.exMeshSize.options}
                 />
 
-                <W_Com_SaveFilePicker
-                    label="保存データファイル選択"
+                <W_Com_SaveFolderPicker
+                    label="⑧ 保存データフォルダ選択"
                     value={savePath}
                     onChange={setSavePath}
-                    defaultName="new.xlsx"
+                    defaultName="new"
                 />
 
+                <div className="text-xs text-gray-600 mt-1">
+                    指定したフォルダ内に「項目名.csv」が生成されます
+                </div>
+
                 <W_In_Button
-                    label="計算実行"
+                    label="⑨ 計算実行"
                     onClick={handleSubmit}
                     disabled={!canSubmit}
                 />
 
                 {/* ✅ 進捗 & メッセージ */}
                 <div className="flex flex-col gap-2 w-full">
-                        <W_Feed_Pro_Bar
-                            label="progress"
-                            value={progress}
-                        />
+                    <W_Feed_Pro_Bar
+                        label="progress"
+                        value={progress}
+                    />
                     <W_Feed_Mess_Message text={message} />
                 </div>
             </div>
